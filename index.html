@@ -39,14 +39,24 @@ header{
   padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
   position:sticky; top:0; z-index:10;
 }
-.hrow{display:flex; align-items:baseline; justify-content:space-between; max-width:640px; margin:0 auto;}
-.hrow h1{font-size:1.15rem; margin:0; letter-spacing:.2px;}
+.hrow{display:flex; align-items:center; justify-content:space-between; max-width:640px; margin:0 auto; gap:8px;}
+.hrow h1{font-size:1.15rem; margin:0; letter-spacing:.2px; flex:1;}
 .hrow h1 span{color:var(--accent);}
-#levelPill{font-size:.8rem; font-weight:600; color:var(--accent); background:var(--accent-soft); padding:2px 10px; border-radius:999px;}
+#levelPill{font-size:.8rem; font-weight:600; color:var(--accent); background:var(--accent-soft); padding:2px 10px; border-radius:999px; white-space:nowrap;}
+#gearBtn{background:none; padding:4px; color:var(--muted); border-radius:8px;}
+#gearBtn.on{color:var(--accent);}
+#gearBtn svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; display:block;}
 .pwrap{max-width:640px; margin:8px auto 0;}
 .pbar{height:6px; background:var(--accent-soft); border-radius:999px; overflow:hidden;}
 #pfill{height:100%; width:0%; background:var(--accent); border-radius:999px; transition:width .4s ease;}
 .psub{display:flex; justify-content:space-between; font-size:.72rem; color:var(--muted); margin-top:4px;}
+#gateBar{
+  display:none; max-width:640px; margin:10px auto 0;
+  background:var(--warn-soft); border-radius:10px; padding:8px 12px;
+  font-size:.85rem; align-items:center; justify-content:space-between; gap:8px;
+}
+#gateBar.show{display:flex;}
+#gateBar button{padding:6px 12px; font-size:.82rem; background:var(--warn); color:#fff;}
 main{max-width:640px; margin:0 auto; padding:16px;}
 .view{display:none;}
 .view.active{display:block; animation:fadein .18s ease;}
@@ -57,6 +67,7 @@ main{max-width:640px; margin:0 auto; padding:16px;}
 }
 .card h2{font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 10px;}
 .sentence{font-size:1.2rem; font-weight:600; min-height:1.5em;}
+.passage{font-size:1.02rem; line-height:1.6;}
 textarea,input[type=text],input[type=password],select{
   width:100%; font:inherit; color:var(--ink); background:var(--bg);
   border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-top:10px;
@@ -86,19 +97,30 @@ button.danger{background:var(--bad-soft); color:var(--bad);}
 .nativebox b{color:var(--good);}
 .notebox{color:var(--muted); font-size:.88rem; margin-top:8px;}
 .statline{font-size:.85rem; color:var(--muted); margin-bottom:10px;}
+.chips{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{
+  background:var(--accent-soft); color:var(--accent); border:none;
+  font-size:.85rem; font-weight:600; padding:8px 14px; border-radius:999px;
+}
+.chip.warn{background:var(--warn-soft); color:var(--warn);}
+.lesson{background:var(--accent-soft); border-radius:10px; padding:12px 14px; font-size:.93rem; line-height:1.55; margin-bottom:12px; white-space:pre-wrap;}
 /* vocab */
 .subtabs{display:flex; gap:8px; margin-bottom:12px;}
-.subtabs button{flex:1; background:var(--card); color:var(--muted); border:1px solid var(--border);}
+.subtabs button{flex:1; background:var(--card); color:var(--muted); border:1px solid var(--border); font-size:.9rem; padding:10px 4px;}
 .subtabs button.on{background:var(--accent); color:#fff; border-color:var(--accent);}
 .dirtoggle{display:flex; justify-content:center; margin-bottom:12px;}
 .dirtoggle button{background:var(--accent-soft); color:var(--accent); font-size:.85rem; padding:6px 14px;}
 .flashcard{
   background:var(--card); border:1px solid var(--border); border-radius:16px;
   min-height:170px; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:20px; text-align:center; box-shadow:var(--shadow); margin-bottom:12px;
+  padding:20px; text-align:center; box-shadow:var(--shadow); margin-bottom:12px; position:relative;
 }
 .flashcard .front{font-size:1.5rem; font-weight:700;}
 .flashcard .back{font-size:1.15rem; color:var(--accent); margin-top:10px; font-weight:600;}
+#fcHear{
+  position:absolute; top:10px; right:10px; background:var(--accent-soft); color:var(--accent);
+  padding:6px 10px; font-size:.8rem; border-radius:8px;
+}
 .gradebtns{display:none; gap:8px;}
 .gradebtns.show{display:flex;}
 .gradebtns button{flex:1; padding:12px 4px; font-size:.85rem;}
@@ -114,6 +136,28 @@ button.danger{background:var(--bad-soft); color:var(--bad);}
 .matchgrid button.sel{border-color:var(--accent); background:var(--accent-soft); color:var(--accent);}
 .matchgrid button.done{opacity:.25; pointer-events:none;}
 .matchgrid button.wrong{border-color:var(--bad); background:var(--bad-soft); color:var(--bad);}
+.weakrow{
+  display:flex; align-items:center; gap:10px; padding:10px 0;
+  border-bottom:1px solid var(--border); font-size:.95rem;
+}
+.weakrow:last-child{border-bottom:none;}
+.weakrow .w-no{font-weight:700;}
+.weakrow .w-en{color:var(--muted);}
+.weakrow .w-meta{margin-left:auto; font-size:.75rem; color:var(--bad); white-space:nowrap;}
+.weakrow .w-hear{background:var(--accent-soft); color:var(--accent); padding:4px 9px; font-size:.78rem; border-radius:8px;}
+/* reading questions */
+.qblock{margin-top:14px; padding-top:12px; border-top:1px solid var(--border);}
+.qblock .qtext{font-weight:600; margin-bottom:8px;}
+.opts{display:flex; flex-direction:column; gap:6px;}
+.opts button{
+  background:var(--bg); color:var(--ink); border:1px solid var(--border);
+  text-align:left; font-weight:500; padding:10px 12px;
+}
+.opts button.correct{background:var(--good-soft); border-color:var(--good); color:var(--good); font-weight:700;}
+.opts button.incorrect{background:var(--bad-soft); border-color:var(--bad); color:var(--bad);}
+.opts button:disabled{opacity:1; cursor:default;}
+.why{font-size:.85rem; color:var(--muted); margin-top:6px; display:none;}
+.why.show{display:block;}
 /* chat */
 #chatLog{display:flex; flex-direction:column; gap:10px; margin-bottom:12px; min-height:120px;}
 .msg{max-width:85%; padding:10px 14px; border-radius:16px; font-size:.97rem;}
@@ -134,10 +178,10 @@ nav{
   display:flex; padding-bottom:env(safe-area-inset-bottom);
 }
 nav button{
-  flex:1; background:none; color:var(--muted); font-size:.72rem; font-weight:600;
-  padding:8px 2px 10px; border-radius:0; display:flex; flex-direction:column; align-items:center; gap:2px;
+  flex:1; background:none; color:var(--muted); font-size:.66rem; font-weight:600;
+  padding:8px 1px 10px; border-radius:0; display:flex; flex-direction:column; align-items:center; gap:2px;
 }
-nav button svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+nav button svg{width:21px; height:21px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
 nav button.on{color:var(--accent);}
 /* toast */
 #toast{
@@ -149,7 +193,7 @@ nav button.on{color:var(--accent);}
 }
 #toast.show{opacity:1;}
 .spin{display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-2px; margin-right:6px;}
-button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-top-color:var(--accent);}
+button.ghost .spin,button.subtle .spin,button.chip .spin{border-color:var(--accent-soft); border-top-color:var(--accent);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .hint{font-size:.82rem; color:var(--muted); margin-top:8px;}
 .bigstat{display:flex; gap:10px; margin-top:4px;}
@@ -161,11 +205,16 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
 <body>
 
 <header>
-  <div class="hrow"><h1>Nor<span>Gareth</span></h1><span id="levelPill">Level 1</span></div>
+  <div class="hrow">
+    <h1>Nor<span>Gareth</span></h1>
+    <span id="levelPill">Level 1</span>
+    <button id="gearBtn" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.1-1.3L14 3h-4l-.5 2.6a7 7 0 0 0-2.1 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.1 1.3L10 21h4l.5-2.6a7 7 0 0 0 2.1-1.3l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg></button>
+  </div>
   <div class="pwrap">
     <div class="pbar"><div id="pfill"></div></div>
     <div class="psub"><span id="plabel">A2</span><span id="ppct">0% to B1</span></div>
   </div>
+  <div id="gateBar"><span>Checkpoint reached! Pass a short test to keep leveling.</span><button id="gateBtn">Take the test</button></div>
 </header>
 
 <main>
@@ -187,13 +236,18 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
 <!-- VOCAB -->
 <section class="view" id="view-vocab">
   <div class="subtabs">
-    <button id="vtFlash" class="on">Flashcards</button>
+    <button id="vtFlash" class="on">Cards</button>
     <button id="vtMatch">Matching</button>
+    <button id="vtWeak">Weak words</button>
   </div>
   <div class="dirtoggle"><button id="vDir">Norwegian &rarr; English</button></div>
   <div class="statline" id="vStats"></div>
   <div id="vFlashArea">
-    <div class="flashcard" id="fcCard"><div class="front" id="fcFront">No cards yet</div><div class="back" id="fcBack" style="display:none"></div></div>
+    <div class="flashcard" id="fcCard">
+      <button id="fcHear" style="display:none">&#128266; Hear</button>
+      <div class="front" id="fcFront">No cards yet</div>
+      <div class="back" id="fcBack" style="display:none"></div>
+    </div>
     <div class="btnrow" id="fcRevealRow"><button id="fcReveal">Show answer</button></div>
     <div class="gradebtns" id="fcGrades">
       <button class="g-again" data-g="0">Again</button>
@@ -208,10 +262,64 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
     <div class="btnrow"><button class="ghost" id="mNew">New round</button></div>
     <div class="hint" id="mHint"></div>
   </div>
+  <div id="vWeakArea" style="display:none">
+    <div class="card">
+      <h2>Your toughest cards</h2>
+      <div id="weakList"></div>
+      <div class="btnrow">
+        <button id="weakDrill">Drill these</button>
+        <button class="ghost" id="weakPhrase">Make phrase cards</button>
+      </div>
+      <div class="hint">Ranked by how often they beat you. "Make phrase cards" builds short natural phrases around the five hardest words, so you learn them in context.</div>
+    </div>
+  </div>
   <div class="card" id="seedCard" style="display:none">
     <h2>Starter deck</h2>
-    <p style="margin:0 0 4px; font-size:.92rem;">Your deck is nearly empty. Seed it with 30 words picked for your level and topics; your mistakes in other modes will grow it from there.</p>
+    <p style="margin:0 0 4px; font-size:.92rem;">Your deck is nearly empty. Seed it with 30 items picked for your level and topics; your mistakes in other modes will grow it from there.</p>
     <div class="btnrow"><button id="seedBtn">Seed starter deck</button></div>
+  </div>
+</section>
+
+<!-- GRAMMAR -->
+<section class="view" id="view-grammar">
+  <div class="card" id="gPicker">
+    <h2>Your rough spots</h2>
+    <div class="chips" id="gMistakes"><span class="hint">Do a few Translate or Listening exercises and your recurring error patterns will show up here.</span></div>
+    <h2 style="margin-top:16px">All topics</h2>
+    <div class="chips" id="gTopics"></div>
+  </div>
+  <div id="gArea" style="display:none">
+    <div class="card">
+      <h2 id="gTitle">Lesson</h2>
+      <div class="lesson" id="gLesson"></div>
+      <div class="statline" id="gProg"></div>
+      <div class="sentence" id="gExPrompt"></div>
+      <textarea id="gInput" placeholder="Skriv på norsk..." autocapitalize="sentences" autocomplete="off"></textarea>
+      <div class="btnrow">
+        <button id="gCheck">Check</button>
+        <button class="ghost" id="gNext" style="display:none">Next</button>
+      </div>
+      <div class="result" id="gResult"></div>
+      <div class="btnrow"><button class="subtle" id="gBack">Choose another topic</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- READ -->
+<section class="view" id="view-read">
+  <div class="card">
+    <h2>Reading</h2>
+    <p class="hint" id="rdHint" style="margin-top:0">A short Norwegian text at your level, with questions. Texts get longer as you level up.</p>
+    <div class="btnrow"><button id="rdNew">New text</button></div>
+  </div>
+  <div id="rdArea" style="display:none">
+    <div class="card">
+      <div class="passage" id="rdPassage"></div>
+      <h2 style="margin-top:14px">Tricky words</h2>
+      <div class="chips" id="rdGloss"></div>
+      <div id="rdQs"></div>
+      <div class="nativebox" id="rdScore" style="display:none"></div>
+    </div>
   </div>
 </section>
 
@@ -219,7 +327,7 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
 <section class="view" id="view-listen">
   <div class="card">
     <h2>Listening</h2>
-    <p class="hint" id="liHint">Tap "New sentence", then Play, and type what you hear in Norwegian.</p>
+    <p class="hint" id="liHint">Tap "New sentence", then Play, and type what you hear in Norwegian. Clips get longer as you level up.</p>
     <div class="btnrow">
       <button id="liPlay" disabled>&#9654; Play</button>
       <button class="ghost" id="liSlow" disabled>Slow</button>
@@ -241,6 +349,28 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
   <div class="btnrow"><button class="subtle" id="chReset">Start a new conversation</button></div>
 </section>
 
+<!-- CHECKPOINT TEST -->
+<section class="view" id="view-test">
+  <div class="card">
+    <h2 id="tHead">Checkpoint test</h2>
+    <div class="statline" id="tProg"></div>
+    <div class="sentence" id="tPrompt"></div>
+    <div class="btnrow" id="tAudioRow" style="display:none">
+      <button id="tPlay">&#9654; Play</button>
+      <button class="ghost" id="tSlow">Slow</button>
+    </div>
+    <div class="opts" id="tOpts" style="display:none; margin-top:12px"></div>
+    <textarea id="tInput" placeholder="Ditt svar..." autocapitalize="sentences" autocomplete="off"></textarea>
+    <div class="btnrow">
+      <button id="tCheck">Check</button>
+      <button class="ghost" id="tNext" style="display:none">Next</button>
+    </div>
+    <div class="result" id="tResult"></div>
+    <div class="nativebox" id="tSummary" style="display:none"></div>
+    <div class="btnrow"><button class="subtle" id="tBack">Back to practice</button></div>
+  </div>
+</section>
+
 <!-- SETTINGS -->
 <section class="view" id="view-settings">
   <div class="card">
@@ -252,6 +382,11 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
       <option value="easier">Easier</option>
       <option value="standard" selected>Standard</option>
       <option value="harder">Harder</option>
+    </select>
+    <label for="sCardStyle">New vocabulary cards</label>
+    <select id="sCardStyle">
+      <option value="phrases" selected>Words and short phrases</option>
+      <option value="words">Single words only</option>
     </select>
     <label for="sTopics">Topics to draw from</label>
     <textarea id="sTopics"></textarea>
@@ -284,9 +419,10 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
 <nav>
   <button data-view="translate" class="on"><svg viewBox="0 0 24 24"><path d="M4 5h9M8.5 5v2.5c0 3-2 5.5-4.5 6.5M5.5 9c1 2.7 3.5 5 6.5 5.5M13 19l4-9 4 9M14.2 16.5h5.6"/></svg>Translate</button>
   <button data-view="vocab"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="13" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13M7 10h5M7 14h5"/></svg>Vocab</button>
+  <button data-view="grammar"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.6H20l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 8.6h6.1z"/></svg>Grammar</button>
+  <button data-view="read"><svg viewBox="0 0 24 24"><path d="M12 6c-1.5-1.3-3.5-2-6-2H4v14h2c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h2V4h-2c-2.5 0-4.5.7-6 2zM12 6v14"/></svg>Read</button>
   <button data-view="listen"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 6a9 9 0 0 1 0 12"/></svg>Listen</button>
   <button data-view="chat"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/><path d="M8.5 11h.01M12.5 11h.01M16.5 11h.01"/></svg>Chat</button>
-  <button data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.1-1.3L14 3h-4l-.5 2.6a7 7 0 0 0-2.1 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.1 1.3L10 21h4l.5-2.6a7 7 0 0 0 2.1-1.3l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>Settings</button>
 </nav>
 
 <div id="toast"></div>
@@ -294,27 +430,32 @@ button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-t
 <script>
 "use strict";
 /* ============================================================
-   NorGareth v1
+   NorGareth v2
    Single-file Norwegian (Bokmål) practice app.
    All state in localStorage. AI: Anthropic API, claude-haiku-4-5.
+   v2 adds: grammar module, reading mode, weak words view,
+   phrase cards, flashcard audio, checkpoint tests, scaled listening.
    ============================================================ */
 
-const STORE_KEY = "norgareth_v1";
+const STORE_KEY = "norgareth_v1"; // unchanged so v1 progress carries over
 const KEY_KEY = "norgareth_apikey";
 const MODEL = "claude-haiku-4-5";
 const TOTAL_LEVELS = 300;
 const XP_PER_LEVEL = 100;
+const GATE_EVERY = 10;
 const DEFAULT_TOPICS = "communications work at BSI (standards, corporate comms), rowing, weightlifting, reading, backgammon, everyday American life (errands, food, weather, travel)";
 
 const $ = id => document.getElementById(id);
 
 /* ---------- state ---------- */
 let S = {
-  settings: { difficulty: "standard", topics: DEFAULT_TOPICS, voiceURI: "" },
+  settings: { difficulty: "standard", topics: DEFAULT_TOPICS, voiceURI: "", cardStyle: "phrases" },
   level: 1, xp: 0,
-  deck: [],            // {id,no,en,ef,reps,interval,due,added}
+  deck: [],            // {id,no,en,ef,reps,interval,due,added,lapses}
   stats: { exercises: 0, days: {} },
-  recentEn: []         // last generated English sentences, to avoid repeats
+  recentEn: [],        // last generated English sentences, to avoid repeats
+  grammarLog: {},      // {tag: count}
+  gate: { pending: false, level: 0 }
 };
 
 function load() {
@@ -323,10 +464,13 @@ function load() {
     if (raw) {
       const d = JSON.parse(raw);
       S = Object.assign(S, d);
-      S.settings = Object.assign({ difficulty:"standard", topics:DEFAULT_TOPICS, voiceURI:"" }, d.settings || {});
+      S.settings = Object.assign({ difficulty:"standard", topics:DEFAULT_TOPICS, voiceURI:"", cardStyle:"phrases" }, d.settings || {});
       S.stats = Object.assign({ exercises:0, days:{} }, d.stats || {});
+      S.grammarLog = d.grammarLog || {};
+      S.gate = d.gate || { pending: false, level: 0 };
       if (!Array.isArray(S.deck)) S.deck = [];
       if (!Array.isArray(S.recentEn)) S.recentEn = [];
+      for (const c of S.deck) { if (c.lapses == null) c.lapses = 0; }
     }
   } catch (e) { console.error("load failed", e); }
 }
@@ -335,13 +479,12 @@ function save() {
   catch (e) { toast("Could not save progress: " + e.message); }
 }
 function apiKey() { return localStorage.getItem(KEY_KEY) || ""; }
-
 function markDay() {
   const d = new Date().toISOString().slice(0, 10);
   if (!S.stats.days[d]) { S.stats.days[d] = 1; }
 }
 
-/* ---------- progress / levels ---------- */
+/* ---------- progress / levels / checkpoint gate ---------- */
 function cefrLabel(lvl) {
   if (lvl <= 75) return "A2";
   if (lvl <= 150) return "A2+";
@@ -349,30 +492,39 @@ function cefrLabel(lvl) {
   if (lvl < TOTAL_LEVELS) return "B1 in sight";
   return "B1";
 }
-function addXP(n) {
-  if (n <= 0) return;
-  S.xp += n;
+function levelLoop() {
   let leveled = false;
-  while (S.xp >= XP_PER_LEVEL && S.level < TOTAL_LEVELS) {
+  while (S.xp >= XP_PER_LEVEL && S.level < TOTAL_LEVELS && !S.gate.pending) {
     S.xp -= XP_PER_LEVEL; S.level++; leveled = true;
+    if (S.level % GATE_EVERY === 0) {
+      S.gate = { pending: true, level: S.level };
+      toast("Level " + S.level + " checkpoint! Pass a short test to keep leveling.", 4500);
+    }
   }
-  if (S.level >= TOTAL_LEVELS) { S.level = TOTAL_LEVELS; S.xp = Math.min(S.xp, XP_PER_LEVEL); }
-  S.stats.exercises++;
+  return leveled;
+}
+function addXP(n, countExercise) {
+  if (n > 0) {
+    S.xp += n;
+    const leveled = levelLoop();
+    if (leveled && !S.gate.pending) toast("Level up! Now level " + S.level + " (" + cefrLabel(S.level) + ")");
+  }
+  if (countExercise !== false) S.stats.exercises++;
   markDay();
   save();
   renderProgress();
-  if (leveled) toast("Level up! Now level " + S.level + " (" + cefrLabel(S.level) + ")");
 }
 function renderProgress() {
   $("levelPill").textContent = "Level " + S.level;
   $("plabel").textContent = cefrLabel(S.level);
-  const total = ((S.level - 1) * XP_PER_LEVEL + S.xp) / (TOTAL_LEVELS * XP_PER_LEVEL);
+  const total = ((S.level - 1) * XP_PER_LEVEL + Math.min(S.xp, XP_PER_LEVEL)) / (TOTAL_LEVELS * XP_PER_LEVEL);
   const pct = Math.min(100, total * 100);
   $("pfill").style.width = pct.toFixed(2) + "%";
   $("ppct").textContent = pct < 100 ? pct.toFixed(1) + "% to B1" : "B1 reached!";
+  $("gateBar").classList.toggle("show", !!S.gate.pending);
 }
 
-/* ---------- toast / busy ---------- */
+/* ---------- toast / busy / esc ---------- */
 let toastTimer = null;
 function toast(msg, ms) {
   const t = $("toast");
@@ -399,7 +551,7 @@ function esc(s) {
 /* ---------- Anthropic API ---------- */
 async function callClaude(system, messages, maxTokens) {
   const key = apiKey();
-  if (!key) { throw new Error("No API key set. Add it in Settings."); }
+  if (!key) { throw new Error("No API key set. Add it in Settings (gear icon, top right)."); }
   let res;
   try {
     res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -440,11 +592,59 @@ function promptContext() {
     ". Topics to draw from naturally: " + S.settings.topics +
     ". Always Bokmål, never Nynorsk. English text uses US spelling. Never use em dashes anywhere.";
 }
+function vocabSpec() {
+  return S.settings.cardStyle === "phrases"
+    ? "vocab items may be single words or short natural phrases of 2 to 5 words (collocations and chunks worth memorizing as units)"
+    : "vocab items are single words or fixed expressions";
+}
+const TAG_LIST = "word order, subordinate clauses, verb tense, verb form, adjective agreement, noun gender or article, definite form, preposition, pronoun, plural, question formation, vocabulary choice, spelling, other";
+
+/* ---------- shared marking ---------- */
+async function markTranslation(english, norwegian, extraNote) {
+  const sys = "You are a precise, encouraging Norwegian Bokmål teacher marking a translation. " + promptContext() +
+    (extraNote ? " " + extraNote : "") +
+    ' Mark the learner\'s Norwegian against the English. Respond with only JSON: ' +
+    '{"score": 0-100, "corrected": "the learner\'s answer with minimal fixes applied", ' +
+    '"errors": [{"issue": "3-6 word label", "explanation": "clear English explanation of the rule and why", "tag": "one of: ' + TAG_LIST + '"}], ' +
+    '"native": "what a native speaker would most naturally say", ' +
+    '"comment": "one short honest sentence of feedback, not gushing", ' +
+    '"vocab": [{"no": "bokmål item", "en": "english"}]} ' +
+    "vocab holds up to 3 items the learner got wrong or was missing, worth drilling (" + vocabSpec() + "); [] if none. " +
+    "If the answer is fully correct and natural, errors is [] and score is 95-100. " +
+    "Word-order, gender, and preposition slips all deserve an errors entry. Explanations teach; never just restate the fix.";
+  return callJSON(sys, [{ role: "user", content: "English: " + english + "\nLearner's Norwegian: " + norwegian }], 1200);
+}
+function logErrors(j) {
+  let logged = false;
+  for (const e of (j.errors || [])) {
+    if (e.tag && e.tag !== "spelling") { S.grammarLog[e.tag] = (S.grammarLog[e.tag] || 0) + 1; logged = true; }
+  }
+  if (logged) save();
+}
+function renderMarking(el, j) {
+  const score = Math.max(0, Math.min(100, j.score || 0));
+  const cls = score >= 85 ? "good" : score >= 55 ? "mid" : "low";
+  let html = '<div class="scoreline"><span class="scorebadge ' + cls + '">' + score + '</span>' +
+    '<span style="font-size:.92rem">' + esc(j.comment || "") + "</span></div>";
+  for (const e of j.errors || []) {
+    html += '<div class="errbox"><b>' + esc(e.issue) + ":</b> " + esc(e.explanation) + "</div>";
+  }
+  if (j.corrected && (j.errors || []).length) {
+    html += '<div class="notebox">Corrected: ' + esc(j.corrected) + "</div>";
+  }
+  if (j.native) html += '<div class="nativebox"><b>A native would say:</b> ' + esc(j.native) + "</div>";
+  el.innerHTML = html;
+  el.classList.add("show");
+}
+function absorbVocab(j) {
+  const gained = addCards(j.vocab);
+  if (gained) toast(gained + (gained === 1 ? " card" : " cards") + " added to your deck");
+}
 
 /* ---------- SRS (SM-2) ---------- */
 function newCard(no, en) {
   return { id: Date.now() + "_" + Math.random().toString(36).slice(2, 7),
-    no: no.trim(), en: en.trim(), ef: 2.5, reps: 0, interval: 0, due: Date.now(), added: Date.now() };
+    no: no.trim(), en: en.trim(), ef: 2.5, reps: 0, interval: 0, due: Date.now(), added: Date.now(), lapses: 0 };
 }
 function addCards(pairs) {
   let added = 0;
@@ -459,10 +659,10 @@ function addCards(pairs) {
   return added;
 }
 function gradeCard(card, q) {
-  // q: 0 again, 3 hard, 4 good, 5 easy
   if (q < 3) {
     card.reps = 0; card.interval = 0;
-    card.due = Date.now() + 10 * 60 * 1000; // 10 minutes
+    card.lapses = (card.lapses || 0) + 1;
+    card.due = Date.now() + 10 * 60 * 1000;
   } else {
     if (card.reps === 0) card.interval = 1;
     else if (card.reps === 1) card.interval = 6;
@@ -477,17 +677,27 @@ function dueCards() {
   const now = Date.now();
   return S.deck.filter(c => c.due <= now).sort((a, b) => a.due - b.due);
 }
+function weakCards(n) {
+  return [...S.deck]
+    .sort((a, b) => ((a.ef - b.ef) || ((b.lapses || 0) - (a.lapses || 0))))
+    .slice(0, n || 15);
+}
 
 /* ---------- navigation ---------- */
+function showView(name) {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.view === name));
+  $("gearBtn").classList.toggle("on", name === "settings");
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  $("view-" + name).classList.add("active");
+  if (name === "vocab") { renderVocabStats(); refreshFlashQueue(); }
+  if (name === "grammar") renderGrammarPicker();
+  if (name === "settings") renderStats();
+}
 document.querySelectorAll("nav button").forEach(b => {
-  b.addEventListener("click", () => {
-    document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    $("view-" + b.dataset.view).classList.add("active");
-    if (b.dataset.view === "vocab") { renderVocabStats(); refreshFlashQueue(); }
-    if (b.dataset.view === "settings") renderStats();
-  });
+  b.addEventListener("click", () => showView(b.dataset.view));
 });
+$("gearBtn").addEventListener("click", () => showView("settings"));
+$("gateBtn").addEventListener("click", () => { showView("test"); startTest(); });
 
 /* ============================================================
    MODE 1: TRANSLATE
@@ -516,7 +726,6 @@ async function trNewSentence() {
   } catch (e) { toast(e.message); }
   busy(btn, false);
 }
-
 async function trCheckAnswer() {
   const ans = $("trInput").value.trim();
   if (!trCurrent) { toast("Get a sentence first."); return; }
@@ -524,48 +733,21 @@ async function trCheckAnswer() {
   const btn = $("trCheck");
   busy(btn, true, "Marking...");
   try {
-    const sys = "You are a precise, encouraging Norwegian Bokmål teacher marking a translation. " + promptContext() +
-      ' Mark the learner\'s Norwegian against the English. Respond with only JSON: ' +
-      '{"score": 0-100, "corrected": "the learner\'s answer with minimal fixes applied", ' +
-      '"errors": [{"issue": "3-6 word label", "explanation": "clear English explanation of the rule and why"}], ' +
-      '"native": "what a native speaker would most naturally say", ' +
-      '"comment": "one short honest sentence of feedback, not gushing", ' +
-      '"vocab": [{"no": "bokmål word or short phrase", "en": "english"}]} ' +
-      "vocab holds up to 3 items the learner got wrong or was missing, worth drilling; [] if none. " +
-      "If the answer is fully correct and natural, errors is [] and score is 95-100. " +
-      "Word-order, gender, and preposition slips all deserve an errors entry. Explanations teach; never just restate the fix.";
-    const j = await callJSON(sys, [{ role: "user", content: "English: " + trCurrent + "\nLearner's Norwegian: " + ans }], 1200);
+    const j = await markTranslation(trCurrent, ans);
     renderMarking($("trResult"), j);
-    const gained = addCards(j.vocab);
-    if (gained) toast(gained + (gained === 1 ? " word" : " words") + " added to your deck");
+    logErrors(j);
+    absorbVocab(j);
     addXP(Math.max(1, Math.round((j.score || 0) / 10)));
   } catch (e) { toast(e.message); }
   busy(btn, false);
 }
-
-function renderMarking(el, j) {
-  const score = Math.max(0, Math.min(100, j.score || 0));
-  const cls = score >= 85 ? "good" : score >= 55 ? "mid" : "low";
-  let html = '<div class="scoreline"><span class="scorebadge ' + cls + '">' + score + '</span>' +
-    '<span style="font-size:.92rem">' + esc(j.comment || "") + "</span></div>";
-  for (const e of j.errors || []) {
-    html += '<div class="errbox"><b>' + esc(e.issue) + ":</b> " + esc(e.explanation) + "</div>";
-  }
-  if (j.corrected && (j.errors || []).length) {
-    html += '<div class="notebox">Corrected: ' + esc(j.corrected) + "</div>";
-  }
-  if (j.native) html += '<div class="nativebox"><b>A native would say:</b> ' + esc(j.native) + "</div>";
-  el.innerHTML = html;
-  el.classList.add("show");
-}
-
 $("trNew").addEventListener("click", trNewSentence);
 $("trCheck").addEventListener("click", trCheckAnswer);
 
 /* ============================================================
-   MODE 2: VOCABULARY (flashcards + matching)
+   MODE 2: VOCABULARY (flashcards + matching + weak words)
    ============================================================ */
-let vDir = "no-en";       // or "en-no"
+let vDir = "no-en";
 let flashQueue = [];
 let flashCard = null;
 
@@ -575,7 +757,6 @@ function renderVocabStats() {
   $("seedCard").style.display = S.deck.length < 10 ? "" : "none";
 }
 function dirLabel() { return vDir === "no-en" ? "Norwegian → English" : "English → Norwegian"; }
-
 $("vDir").addEventListener("click", () => {
   vDir = vDir === "no-en" ? "en-no" : "no-en";
   $("vDir").textContent = dirLabel();
@@ -583,15 +764,19 @@ $("vDir").addEventListener("click", () => {
 });
 $("vtFlash").addEventListener("click", () => switchVocabTab("flash"));
 $("vtMatch").addEventListener("click", () => switchVocabTab("match"));
+$("vtWeak").addEventListener("click", () => switchVocabTab("weak"));
 function switchVocabTab(t) {
   $("vtFlash").classList.toggle("on", t === "flash");
   $("vtMatch").classList.toggle("on", t === "match");
+  $("vtWeak").classList.toggle("on", t === "weak");
   $("vFlashArea").style.display = t === "flash" ? "" : "none";
   $("vMatchArea").style.display = t === "match" ? "" : "none";
+  $("vWeakArea").style.display = t === "weak" ? "" : "none";
+  $("vDir").parentElement.style.display = t === "weak" ? "none" : "";
   if (t === "flash") refreshFlashQueue();
-  else newMatchRound();
+  else if (t === "match") newMatchRound();
+  else renderWeakList();
 }
-
 function refreshFlashQueue() {
   flashQueue = dueCards().slice(0, 20);
   nextFlashCard();
@@ -605,6 +790,7 @@ function showFlashCard() {
   back.style.display = "none";
   $("fcGrades").classList.remove("show");
   $("fcRevealRow").style.display = "";
+  $("fcHear").style.display = "none";
   if (!flashCard) {
     front.textContent = S.deck.length === 0 ? "No cards yet. Seed the starter deck below, or make some mistakes in the other modes!" : "Nothing due right now. Nice.";
     $("fcRevealRow").style.display = "none";
@@ -612,19 +798,23 @@ function showFlashCard() {
   }
   front.textContent = vDir === "no-en" ? flashCard.no : flashCard.en;
   back.textContent = vDir === "no-en" ? flashCard.en : flashCard.no;
+  // Hear button: available whenever the Norwegian side is visible
+  if (vDir === "no-en" && canSpeak()) $("fcHear").style.display = "";
 }
+$("fcHear").addEventListener("click", () => flashCard && speak(flashCard.no, 1));
 $("fcReveal").addEventListener("click", () => {
   if (!flashCard) return;
   $("fcBack").style.display = "";
   $("fcRevealRow").style.display = "none";
   $("fcGrades").classList.add("show");
+  if (canSpeak()) $("fcHear").style.display = "";
 });
 document.querySelectorAll("#fcGrades button").forEach(b => {
   b.addEventListener("click", () => {
     if (!flashCard) return;
     const q = parseInt(b.dataset.g, 10);
     gradeCard(flashCard, q);
-    if (q === 0) flashQueue.push(flashCard); // see it again this session
+    if (q === 0) flashQueue.push(flashCard);
     addXP(q >= 4 ? 2 : 1);
     renderVocabStats();
     nextFlashCard();
@@ -638,7 +828,6 @@ $("fcPractice").addEventListener("click", () => {
 
 /* ----- matching pairs ----- */
 let mCards = [], mSel = null, mWrong = {}, mDone = 0;
-
 function newMatchRound() {
   const due = dueCards();
   const pool = due.length >= 5 ? due : [...S.deck].sort(() => Math.random() - 0.5);
@@ -648,15 +837,14 @@ function newMatchRound() {
   grid.innerHTML = "";
   $("mHint").textContent = "";
   if (mCards.length < 2) {
-    $("mHint").textContent = "You need at least 2 cards in the deck for matching. Seed the starter deck in Flashcards.";
+    $("mHint").textContent = "You need at least 2 cards in the deck for matching. Seed the starter deck in Cards.";
     return;
   }
   const left = [...mCards].sort(() => Math.random() - 0.5);
   const right = [...mCards].sort(() => Math.random() - 0.5);
   const leftKey = vDir === "no-en" ? "no" : "en";
   const rightKey = vDir === "no-en" ? "en" : "no";
-  const maxRows = Math.max(left.length, right.length);
-  for (let i = 0; i < maxRows; i++) {
+  for (let i = 0; i < left.length; i++) {
     grid.appendChild(matchBtn(left[i], leftKey, "L"));
     grid.appendChild(matchBtn(right[i], rightKey, "R"));
   }
@@ -671,11 +859,7 @@ function matchBtn(card, key, side) {
 }
 function matchTap(btn, card) {
   if (btn.classList.contains("done")) return;
-  if (!mSel) {
-    mSel = btn;
-    btn.classList.add("sel");
-    return;
-  }
+  if (!mSel) { mSel = btn; btn.classList.add("sel"); return; }
   if (mSel === btn) { btn.classList.remove("sel"); mSel = null; return; }
   if (mSel.dataset.side === btn.dataset.side) {
     mSel.classList.remove("sel"); mSel = btn; btn.classList.add("sel"); return;
@@ -702,13 +886,68 @@ function matchTap(btn, card) {
 }
 $("mNew").addEventListener("click", newMatchRound);
 
+/* ----- weak words ----- */
+function renderWeakList() {
+  const list = $("weakList");
+  list.innerHTML = "";
+  const weak = weakCards(15).filter(c => (c.lapses || 0) > 0 || c.ef < 2.5);
+  const rows = weak.length ? weak : weakCards(10);
+  if (S.deck.length === 0) {
+    list.innerHTML = '<span class="hint">The deck is empty. Seed it in the Cards tab first.</span>';
+    return;
+  }
+  if (!weak.length) {
+    list.insertAdjacentHTML("beforeend", '<div class="hint" style="margin-bottom:8px">Nothing has beaten you yet. Here are your newest cards instead:</div>');
+  }
+  for (const c of rows) {
+    const row = document.createElement("div");
+    row.className = "weakrow";
+    row.innerHTML = '<span class="w-no">' + esc(c.no) + '</span><span class="w-en">' + esc(c.en) + '</span>' +
+      '<span class="w-meta">' + (c.lapses ? c.lapses + "x missed" : "") + "</span>";
+    if (canSpeak()) {
+      const h = document.createElement("button");
+      h.className = "w-hear";
+      h.innerHTML = "&#128266;";
+      h.addEventListener("click", () => speak(c.no, 1));
+      row.appendChild(h);
+    }
+    list.appendChild(row);
+  }
+}
+$("weakDrill").addEventListener("click", () => {
+  const weak = weakCards(15);
+  if (!weak.length) { toast("No cards to drill yet."); return; }
+  flashQueue = weak;
+  switchVocabTab("flash");
+  nextFlashCard();
+  toast("Drilling your " + weak.length + " toughest cards");
+});
+$("weakPhrase").addEventListener("click", async () => {
+  const weak = weakCards(5);
+  if (weak.length < 2) { toast("Not enough tricky words yet."); return; }
+  const btn = $("weakPhrase");
+  busy(btn, true, "Building...");
+  try {
+    const words = weak.map(c => c.no + " (" + c.en + ")").join(", ");
+    const sys = "You build contextual flashcards for a Norwegian Bokmål learner. " + promptContext() +
+      " For each given word, write one short natural Bokmål phrase of 3 to 6 words that uses the word in a typical context, with its English meaning." +
+      ' Respond with only JSON: {"cards":[{"no":"phrase","en":"english"}]}';
+    const j = await callJSON(sys, [{ role: "user", content: "Words: " + words }], 900);
+    const n = addCards(j.cards);
+    toast(n ? n + " phrase cards added" : "No new cards (duplicates skipped)");
+    renderWeakList();
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+});
+
 /* ----- seed starter deck ----- */
 $("seedBtn").addEventListener("click", async () => {
   const btn = $("seedBtn");
   busy(btn, true, "Building deck...");
   try {
+    const phraseBit = S.settings.cardStyle === "phrases" ? " About a third of the cards should be short natural phrases of 2 to 5 words rather than single words." : "";
     const sys = "You build a starter flashcard deck for a Norwegian Bokmål learner. " + promptContext() +
-      " Create exactly 30 cards: about 20 high-frequency everyday words or short phrases slightly above the learner's comfort zone, and about 10 drawn from the learner's topics. No absolute beginner words (not hei, takk, ja). " +
+      " Create exactly 30 cards: about 20 high-frequency everyday items slightly above the learner's comfort zone, and about 10 drawn from the learner's topics. No absolute beginner words (not hei, takk, ja)." + phraseBit +
       ' Respond with only JSON: {"cards":[{"no":"...","en":"..."}]}';
     const j = await callJSON(sys, [{ role: "user", content: "Build my starter deck." }], 2500);
     const n = addCards(j.cards);
@@ -719,13 +958,193 @@ $("seedBtn").addEventListener("click", async () => {
   busy(btn, false);
 });
 /* ============================================================
-   MODE 3: LISTENING
+   MODE 3: GRAMMAR
    ============================================================ */
-let liCurrent = null;   // {norwegian, english}
+const GRAMMAR_TOPICS = [
+  "V2 word order",
+  "Subordinate clauses (fordi, at, som)",
+  "Adjective agreement",
+  "Definite and indefinite forms",
+  "Prepositions",
+  "Preteritum vs. perfektum",
+  "Modal verbs",
+  "Pronouns and possessives",
+  "Comparatives and superlatives",
+  "Question formation"
+];
+let gExercises = [], gIndex = 0, gTopic = "";
+
+function renderGrammarPicker() {
+  $("gPicker").style.display = "";
+  $("gArea").style.display = "none";
+  const mist = $("gMistakes");
+  const tags = Object.entries(S.grammarLog).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  mist.innerHTML = "";
+  if (!tags.length) {
+    mist.innerHTML = '<span class="hint">Do a few Translate or Listening exercises and your recurring error patterns will show up here.</span>';
+  } else {
+    for (const [tag, count] of tags) {
+      const b = document.createElement("button");
+      b.className = "chip warn";
+      b.textContent = tag + " (" + count + "x)";
+      b.addEventListener("click", () => startDrill(tag, b));
+      mist.appendChild(b);
+    }
+  }
+  const top = $("gTopics");
+  top.innerHTML = "";
+  for (const t of GRAMMAR_TOPICS) {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = t;
+    b.addEventListener("click", () => startDrill(t, b));
+    top.appendChild(b);
+  }
+}
+async function startDrill(topic, btn) {
+  busy(btn, true, "Preparing...");
+  try {
+    const sys = "You are a Norwegian Bokmål teacher creating a focused mini-lesson and drill. " + promptContext() +
+      " Topic: " + topic + ". Write a compact lesson (120 to 180 words of English, with Bokmål examples inline) that explains the rule and the most common trap for English speakers. Then write 5 English sentences to translate into Norwegian, each specifically exercising this topic, easiest first." +
+      ' Respond with only JSON: {"lesson":"...","exercises":[{"english":"..."}]}';
+    const j = await callJSON(sys, [{ role: "user", content: "Teach me: " + topic }], 1800);
+    if (!j.exercises || !j.exercises.length) throw new Error("No exercises returned. Try again.");
+    gTopic = topic;
+    gExercises = j.exercises;
+    gIndex = 0;
+    $("gTitle").textContent = topic;
+    $("gLesson").textContent = j.lesson || "";
+    $("gPicker").style.display = "none";
+    $("gArea").style.display = "";
+    showDrillItem();
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+}
+function showDrillItem() {
+  const ex = gExercises[gIndex];
+  $("gProg").textContent = "Exercise " + (gIndex + 1) + " of " + gExercises.length;
+  $("gExPrompt").textContent = ex.english;
+  $("gInput").value = "";
+  $("gResult").classList.remove("show");
+  $("gCheck").style.display = "";
+  $("gNext").style.display = "none";
+}
+$("gCheck").addEventListener("click", async () => {
+  const ans = $("gInput").value.trim();
+  if (!ans) { toast("Write your Norwegian first."); return; }
+  const btn = $("gCheck");
+  busy(btn, true, "Marking...");
+  try {
+    const j = await markTranslation(gExercises[gIndex].english, ans,
+      "This is a grammar drill on: " + gTopic + ". Pay special attention to that topic in your marking.");
+    renderMarking($("gResult"), j);
+    logErrors(j);
+    absorbVocab(j);
+    addXP(Math.max(1, Math.round((j.score || 0) / 10)));
+    $("gCheck").style.display = "none";
+    $("gNext").style.display = "";
+    $("gNext").textContent = gIndex + 1 < gExercises.length ? "Next" : "Finish";
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+});
+$("gNext").addEventListener("click", () => {
+  gIndex++;
+  if (gIndex < gExercises.length) showDrillItem();
+  else { toast("Drill complete!"); renderGrammarPicker(); }
+});
+$("gBack").addEventListener("click", renderGrammarPicker);
+
+/* ============================================================
+   MODE 4: READING
+   ============================================================ */
+let rdCurrent = null, rdAnswered = 0, rdCorrect = 0;
+
+function readTargetWords() { return Math.min(160, 50 + Math.round(S.level * 0.7)); }
+
+$("rdNew").addEventListener("click", async () => {
+  const btn = $("rdNew");
+  busy(btn, true, "Writing...");
+  try {
+    const sys = "You write a short Norwegian Bokmål reading text with comprehension questions. " + promptContext() +
+      " The text: about " + readTargetWords() + " words, natural and interesting, on one of the learner's topics, level-appropriate. " +
+      "Then 3 multiple-choice comprehension questions IN NORWEGIAN, each with exactly 3 options and one correct answer. Make wrong options plausible. " +
+      "Also pick the 3 hardest words or phrases from the text as a glossary. " +
+      ' Respond with only JSON: {"passage":"...","glossary":[{"no":"...","en":"..."}],"questions":[{"q":"...","options":["...","...","..."],"answer":0,"why":"one short English sentence explaining the answer"}]}';
+    const j = await callJSON(sys, [{ role: "user", content: "One new reading text, please." }], 2200);
+    if (!j.passage || !j.questions) throw new Error("No text returned. Try again.");
+    rdCurrent = j; rdAnswered = 0; rdCorrect = 0;
+    renderReading();
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+});
+function renderReading() {
+  $("rdArea").style.display = "";
+  $("rdPassage").textContent = rdCurrent.passage;
+  $("rdScore").style.display = "none";
+  const gl = $("rdGloss");
+  gl.innerHTML = "";
+  for (const g of rdCurrent.glossary || []) {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = g.no + " = " + g.en + "  +";
+    b.addEventListener("click", () => {
+      const n = addCards([g]);
+      toast(n ? "Added to deck" : "Already in your deck");
+    });
+    gl.appendChild(b);
+  }
+  const qs = $("rdQs");
+  qs.innerHTML = "";
+  rdCurrent.questions.forEach((q, qi) => {
+    const block = document.createElement("div");
+    block.className = "qblock";
+    block.innerHTML = '<div class="qtext">' + (qi + 1) + ". " + esc(q.q) + "</div>";
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    q.options.forEach((opt, oi) => {
+      const b = document.createElement("button");
+      b.textContent = opt;
+      b.addEventListener("click", () => answerReading(q, oi, opts, why));
+      opts.appendChild(b);
+    });
+    const why = document.createElement("div");
+    why.className = "why";
+    why.textContent = q.why || "";
+    block.appendChild(opts);
+    block.appendChild(why);
+    qs.appendChild(block);
+  });
+}
+function answerReading(q, chosen, optsEl, whyEl) {
+  if (optsEl.dataset.done) return;
+  optsEl.dataset.done = "1";
+  const btns = optsEl.querySelectorAll("button");
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.answer) b.classList.add("correct");
+    else if (i === chosen) b.classList.add("incorrect");
+  });
+  whyEl.classList.add("show");
+  rdAnswered++;
+  if (chosen === q.answer) rdCorrect++;
+  if (rdAnswered === rdCurrent.questions.length) {
+    const sc = $("rdScore");
+    sc.style.display = "";
+    sc.innerHTML = "<b>" + rdCorrect + " of " + rdCurrent.questions.length + " correct.</b> " +
+      (rdCorrect === 3 ? "Full marks." : rdCorrect === 2 ? "Solid." : "Tough one; grab the glossary words and try another.");
+    addXP(1 + rdCorrect * 3);
+  }
+}
+
+/* ============================================================
+   MODE 5: LISTENING (length scales with level)
+   ============================================================ */
+let liCurrent = null;
 let noVoice = null;
 
+function canSpeak() { return !!window.speechSynthesis; }
 function pickVoices() {
-  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const voices = canSpeak() ? speechSynthesis.getVoices() : [];
   const nb = voices.filter(v => /^(nb|no|nn)/i.test(v.lang));
   const sel = $("sVoice");
   sel.innerHTML = "";
@@ -744,12 +1163,10 @@ function pickVoices() {
   noVoice = saved || nb.find(v => /^nb/i.test(v.lang)) || nb[0];
   sel.value = noVoice.voiceURI;
 }
-if (window.speechSynthesis) {
-  speechSynthesis.onvoiceschanged = pickVoices;
-}
+if (window.speechSynthesis) speechSynthesis.onvoiceschanged = pickVoices;
 
 function speak(text, rate) {
-  if (!window.speechSynthesis) { toast("This browser has no speech synthesis."); return; }
+  if (!canSpeak()) { toast("This browser has no speech synthesis."); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "nb-NO";
@@ -757,15 +1174,21 @@ function speak(text, rate) {
   u.rate = rate || 1;
   speechSynthesis.speak(u);
 }
-
+function listenSpec() {
+  const words = Math.min(18, 6 + Math.floor(S.level / 12));
+  const sentences = S.level >= 80 ? 2 : 1;
+  return sentences === 1
+    ? "One sentence of about " + words + " words."
+    : "Two connected sentences totaling about " + (words + 6) + " words.";
+}
 async function liNewSentence() {
   const btn = $("liNew");
   busy(btn, true, "Writing...");
   try {
-    const sys = "You write one short Norwegian Bokmål sentence for a listening dictation exercise. " + promptContext() +
-      " 6 to 12 words, natural spoken Norwegian, level-appropriate." +
+    const sys = "You write Norwegian Bokmål for a listening dictation exercise. " + promptContext() +
+      " " + listenSpec() + " Natural spoken Norwegian, level-appropriate." +
       ' Respond with only JSON: {"norwegian":"...","english":"..."}';
-    const j = await callJSON(sys, [{ role: "user", content: "One new dictation sentence." }], 300);
+    const j = await callJSON(sys, [{ role: "user", content: "One new dictation item." }], 400);
     if (!j.norwegian) throw new Error("No sentence returned. Try again.");
     liCurrent = j;
     $("liInput").value = "";
@@ -777,7 +1200,6 @@ async function liNewSentence() {
   } catch (e) { toast(e.message); }
   busy(btn, false);
 }
-
 async function liCheckAnswer() {
   const ans = $("liInput").value.trim();
   if (!liCurrent) return;
@@ -786,33 +1208,32 @@ async function liCheckAnswer() {
   busy(btn, true, "Marking...");
   try {
     const sys = "You mark a Norwegian listening dictation. " + promptContext() +
-      " Compare what the learner typed to the actual sentence. Small spelling slips matter less than missed or wrong words. " +
+      " Compare what the learner typed to the actual text. Small spelling slips matter less than missed or wrong words. " +
       ' Respond with only JSON: {"score":0-100,' +
-      '"errors":[{"issue":"3-6 word label","explanation":"what was missed or misheard and why it matters, in English"}],' +
+      '"errors":[{"issue":"3-6 word label","explanation":"what was missed or misheard and why it matters, in English","tag":"one of: ' + TAG_LIST + '"}],' +
       '"comment":"one short honest sentence",' +
       '"vocab":[{"no":"...","en":"..."}]} ' +
-      "vocab holds up to 3 missed words worth drilling; [] if none. Include the sentence's English meaning in the first error explanation only if the learner was far off.";
-    const j = await callJSON(sys, [{ role: "user", content: "Actual sentence: " + liCurrent.norwegian + "\nLearner typed: " + ans }], 1000);
+      "vocab holds up to 3 missed items worth drilling (" + vocabSpec() + "); [] if none.";
+    const j = await callJSON(sys, [{ role: "user", content: "Actual text: " + liCurrent.norwegian + "\nLearner typed: " + ans }], 1000);
     renderMarking($("liResult"), j);
     $("liResult").insertAdjacentHTML("beforeend",
-      '<div class="nativebox"><b>The sentence was:</b> ' + esc(liCurrent.norwegian) +
+      '<div class="nativebox"><b>The text was:</b> ' + esc(liCurrent.norwegian) +
       '<br><span style="font-size:.85rem">' + esc(liCurrent.english || "") + "</span></div>");
-    const gained = addCards(j.vocab);
-    if (gained) toast(gained + (gained === 1 ? " word" : " words") + " added to your deck");
+    logErrors(j);
+    absorbVocab(j);
     addXP(Math.max(1, Math.round((j.score || 0) / 10)));
   } catch (e) { toast(e.message); }
   busy(btn, false);
 }
-
 $("liNew").addEventListener("click", liNewSentence);
 $("liPlay").addEventListener("click", () => liCurrent && speak(liCurrent.norwegian, 1));
 $("liSlow").addEventListener("click", () => liCurrent && speak(liCurrent.norwegian, 0.72));
 $("liCheck").addEventListener("click", liCheckAnswer);
 
 /* ============================================================
-   MODE 4: CONVERSATION
+   MODE 6: CONVERSATION
    ============================================================ */
-let chatHistory = [];   // [{role, content}] as sent to the API
+let chatHistory = [];
 let chatBusy = false;
 
 function chatBubble(cls, html) {
@@ -839,9 +1260,7 @@ async function chatSend(userText) {
     const recent = chatHistory.slice(-12);
     const j = await callJSON(chatSystem(), recent, 800);
     chatHistory.push({ role: "assistant", content: JSON.stringify(j) });
-    if (userText && j.correction) {
-      chatBubble("corr", "<b>Note:</b> " + esc(j.correction));
-    }
+    if (userText && j.correction) chatBubble("corr", "<b>Note:</b> " + esc(j.correction));
     chatBubble("ai", esc(j.reply || "..."));
     if (userText) addXP(2);
   } catch (e) {
@@ -868,6 +1287,152 @@ $("chReset").addEventListener("click", () => {
 });
 
 /* ============================================================
+   CHECKPOINT TEST
+   5 items, average score >= 70 to pass the gate.
+   ============================================================ */
+let tItems = [], tIdx = 0, tScores = [], tCurrent = null;
+
+function startTest() {
+  if (!S.gate.pending) {
+    $("tPrompt").textContent = "No checkpoint is due right now. Keep practicing!";
+    $("tInput").style.display = "none";
+    $("tCheck").style.display = "none";
+    $("tProg").textContent = "";
+    $("tResult").classList.remove("show");
+    $("tSummary").style.display = "none";
+    $("tAudioRow").style.display = "none";
+    $("tOpts").style.display = "none";
+    return;
+  }
+  tItems = ["en-no", "en-no", "no-en", canSpeak() && noVoice ? "dictation" : "en-no",
+    S.deck.length >= 4 ? "vocab" : "en-no"];
+  tIdx = 0; tScores = [];
+  $("tHead").textContent = "Checkpoint test: level " + S.gate.level;
+  $("tSummary").style.display = "none";
+  nextTestItem();
+}
+async function nextTestItem() {
+  const kind = tItems[tIdx];
+  $("tProg").textContent = "Question " + (tIdx + 1) + " of " + tItems.length;
+  $("tResult").classList.remove("show");
+  $("tInput").value = "";
+  $("tInput").style.display = "";
+  $("tCheck").style.display = "";
+  $("tNext").style.display = "none";
+  $("tAudioRow").style.display = "none";
+  $("tOpts").style.display = "none";
+  $("tPrompt").textContent = "Preparing...";
+  try {
+    if (kind === "en-no") {
+      const sys = "You write one English sentence for a Norwegian checkpoint test. " + promptContext() +
+        ' 8 to 16 words, testing level-appropriate grammar. Respond with only JSON: {"english":"..."}';
+      const j = await callJSON(sys, [{ role: "user", content: "One test sentence." }], 300);
+      tCurrent = { kind, english: j.english };
+      $("tPrompt").textContent = "Translate to Norwegian: " + j.english;
+    } else if (kind === "no-en") {
+      const sys = "You write one Norwegian Bokmål sentence for a comprehension test. " + promptContext() +
+        ' 8 to 14 words. Respond with only JSON: {"norwegian":"..."}';
+      const j = await callJSON(sys, [{ role: "user", content: "One test sentence." }], 300);
+      tCurrent = { kind, norwegian: j.norwegian };
+      $("tPrompt").textContent = "Translate to English: " + j.norwegian;
+    } else if (kind === "dictation") {
+      const sys = "You write Norwegian Bokmål for a dictation test. " + promptContext() +
+        " " + listenSpec() + ' Respond with only JSON: {"norwegian":"..."}';
+      const j = await callJSON(sys, [{ role: "user", content: "One dictation item." }], 300);
+      tCurrent = { kind, norwegian: j.norwegian };
+      $("tPrompt").textContent = "Listen and type what you hear:";
+      $("tAudioRow").style.display = "";
+    } else if (kind === "vocab") {
+      const weak = weakCards(1)[0];
+      const others = S.deck.filter(c => c.id !== weak.id).sort(() => Math.random() - 0.5).slice(0, 3);
+      const options = [weak, ...others].sort(() => Math.random() - 0.5);
+      tCurrent = { kind, card: weak };
+      $("tPrompt").textContent = 'What does "' + weak.no + '" mean?';
+      $("tInput").style.display = "none";
+      $("tCheck").style.display = "none";
+      const box = $("tOpts");
+      box.innerHTML = "";
+      box.style.display = "";
+      options.forEach(c => {
+        const b = document.createElement("button");
+        b.textContent = c.en;
+        b.addEventListener("click", () => {
+          box.querySelectorAll("button").forEach(x => x.disabled = true);
+          const right = c.id === weak.id;
+          b.classList.add(right ? "correct" : "incorrect");
+          if (!right) box.querySelectorAll("button").forEach(x => { if (x.textContent === weak.en) x.classList.add("correct"); });
+          tScores.push(right ? 100 : 0);
+          gradeCard(weak, right ? 4 : 0);
+          $("tNext").style.display = "";
+          $("tNext").textContent = tIdx + 1 < tItems.length ? "Next" : "Finish";
+        });
+        box.appendChild(b);
+      });
+    }
+  } catch (e) {
+    toast(e.message);
+    $("tPrompt").textContent = "Could not load this question. Tap Check to retry.";
+  }
+}
+$("tPlay").addEventListener("click", () => tCurrent && tCurrent.norwegian && speak(tCurrent.norwegian, 1));
+$("tSlow").addEventListener("click", () => tCurrent && tCurrent.norwegian && speak(tCurrent.norwegian, 0.72));
+$("tCheck").addEventListener("click", async () => {
+  if (!tCurrent) { nextTestItem(); return; }
+  const ans = $("tInput").value.trim();
+  if (!ans && tCurrent.kind !== "vocab") { toast("Answer first."); return; }
+  const btn = $("tCheck");
+  busy(btn, true, "Marking...");
+  try {
+    let j;
+    if (tCurrent.kind === "en-no") {
+      j = await markTranslation(tCurrent.english, ans, "This is a checkpoint test; mark strictly.");
+    } else if (tCurrent.kind === "no-en") {
+      const sys = "You mark an English translation of a Norwegian sentence, strictly but fairly. " + promptContext() +
+        ' Respond with only JSON: {"score":0-100,"comment":"one short sentence","errors":[{"issue":"...","explanation":"..."}],"native":"a natural English translation"}';
+      j = await callJSON(sys, [{ role: "user", content: "Norwegian: " + tCurrent.norwegian + "\nLearner's English: " + ans }], 800);
+    } else if (tCurrent.kind === "dictation") {
+      const sys = "You mark a Norwegian dictation, strictly but fairly. " + promptContext() +
+        ' Respond with only JSON: {"score":0-100,"comment":"one short sentence","errors":[{"issue":"...","explanation":"..."}],"native":"' + "" + '"}';
+      j = await callJSON(sys, [{ role: "user", content: "Actual: " + tCurrent.norwegian + "\nLearner typed: " + ans }], 800);
+      j.native = "The text was: " + tCurrent.norwegian;
+    }
+    tScores.push(Math.max(0, Math.min(100, j.score || 0)));
+    renderMarking($("tResult"), j);
+    $("tCheck").style.display = "none";
+    $("tNext").style.display = "";
+    $("tNext").textContent = tIdx + 1 < tItems.length ? "Next" : "Finish";
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+});
+$("tNext").addEventListener("click", () => {
+  tIdx++;
+  if (tIdx < tItems.length) { nextTestItem(); return; }
+  // finished
+  const avg = Math.round(tScores.reduce((a, b) => a + b, 0) / tScores.length);
+  const pass = avg >= 70;
+  const sum = $("tSummary");
+  sum.style.display = "";
+  $("tPrompt").textContent = "";
+  $("tInput").style.display = "none";
+  $("tCheck").style.display = "none";
+  $("tNext").style.display = "none";
+  $("tAudioRow").style.display = "none";
+  $("tOpts").style.display = "none";
+  $("tResult").classList.remove("show");
+  $("tProg").textContent = "Scores: " + tScores.join(", ") + " (average " + avg + ")";
+  if (pass) {
+    S.gate.pending = false;
+    save();
+    sum.innerHTML = "<b>Passed!</b> Level " + S.gate.level + " confirmed. Onward.";
+    addXP(20, false);
+    renderProgress();
+  } else {
+    sum.innerHTML = "<b>Not this time (needed 70).</b> Look at what tripped you up, drill it in Grammar or Vocab, and retake the test from the banner whenever you like.";
+  }
+});
+$("tBack").addEventListener("click", () => showView("translate"));
+
+/* ============================================================
    SETTINGS
    ============================================================ */
 function renderStats() {
@@ -878,6 +1443,7 @@ function renderStats() {
 function loadSettingsUI() {
   $("sKey").value = apiKey();
   $("sDiff").value = S.settings.difficulty;
+  $("sCardStyle").value = S.settings.cardStyle;
   $("sTopics").value = S.settings.topics;
   pickVoices();
 }
@@ -885,9 +1451,10 @@ $("sSave").addEventListener("click", () => {
   const k = $("sKey").value.trim();
   if (k) localStorage.setItem(KEY_KEY, k);
   S.settings.difficulty = $("sDiff").value;
+  S.settings.cardStyle = $("sCardStyle").value;
   S.settings.topics = $("sTopics").value.trim() || DEFAULT_TOPICS;
   S.settings.voiceURI = $("sVoice").value;
-  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const voices = canSpeak() ? speechSynthesis.getVoices() : [];
   noVoice = voices.find(v => v.voiceURI === S.settings.voiceURI) || noVoice;
   save();
   toast("Settings saved");
@@ -912,21 +1479,28 @@ $("sImportFile").addEventListener("change", e => {
     try {
       const d = JSON.parse(r.result);
       if (!d || !Array.isArray(d.deck)) throw new Error("That does not look like a NorGareth backup.");
-      // merge: keep the higher level, union the decks (imported card wins on conflict)
       const byNo = {};
       for (const c of S.deck) byNo[c.no.trim().toLowerCase()] = c;
       for (const c of d.deck) if (c && c.no && c.en) byNo[c.no.trim().toLowerCase()] = c;
       S.deck = Object.values(byNo);
+      for (const c of S.deck) { if (c.lapses == null) c.lapses = 0; }
       if ((d.level || 1) > S.level || ((d.level || 1) === S.level && (d.xp || 0) > S.xp)) {
         S.level = d.level || 1; S.xp = d.xp || 0;
+        S.gate = d.gate || S.gate;
       }
       if (d.stats) {
         S.stats.exercises = Math.max(S.stats.exercises, d.stats.exercises || 0);
         Object.assign(S.stats.days, d.stats.days || {});
       }
+      if (d.grammarLog) {
+        for (const [k, v] of Object.entries(d.grammarLog)) {
+          S.grammarLog[k] = Math.max(S.grammarLog[k] || 0, v);
+        }
+      }
       if (d.settings) {
         S.settings.topics = d.settings.topics || S.settings.topics;
         S.settings.difficulty = d.settings.difficulty || S.settings.difficulty;
+        S.settings.cardStyle = d.settings.cardStyle || S.settings.cardStyle;
       }
       save();
       renderProgress(); renderStats(); renderVocabStats(); loadSettingsUI();
@@ -951,7 +1525,7 @@ renderVocabStats();
 loadSettingsUI();
 if (!apiKey()) {
   setTimeout(() => {
-    toast("Welcome! Add your Anthropic API key in Settings to get started.", 5000);
+    toast("Welcome! Tap the gear icon and add your Anthropic API key to get started.", 5000);
   }, 600);
 }
 </script>

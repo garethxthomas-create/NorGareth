@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NorGareth</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NorGareth">
+<meta name="theme-color" content="#26418f">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAFbUlEQVR42u3d60+TVxzA8T4tFCjQVEAdjAWGCoLiBZWLsGzObTo3HVtw6BiK4nVGp85X+w+WILKJGZHr8BqJbppNE1yMywqoeCMEJXhL441UQRCh0Ote7s1ZsqObkZ7v53V/pJzz5bSl5UFLnLdLB4joWQIQB4gDxAHiAHGAOEAcIA4QB4gDIA4QB4gDxAHiAHGAOEAcIA4QB0AcIA4QB4gDxAHiAHGAOEAcIA6AOEAcIA4QB4gDxAHiAHGAOEAcIA6AOEAcIA4QB4gDxAHiwGgX8Orfxaaj66LGmF7wi3xX8WfNkUv/+X0r+Xbh4vcmP8eg0+VJXbCbk+OVsP6LOeGhQRwGxCFgMQcX589iv4lDrChv5os/PBGHfwoJDvyqMIMtJw6x/I9TY6PN7DpxiF6bBei3rprLrhOH2Efzk5ISoth44hB9w5q2fU02G08cYu9kvjkrNYa9Jw6xHWtz2HviEEubGvNuVgLbTxxi24rn6jWNAohDIDEh6vneMyMOJWwpygoMMBABcQjERpuXLU4lAuIQ21iYbgoJpAPiEIi0mIry0uiAOMSK82dZzMGsA3EIhJmMGwrSWQfiECvInR49Lpx1IA4BY6Bh88pM1oE4xHIXpEyIi2AdiEPAoNe2FfM5IOL4B+/nTJw2+TXWQYk4um4/drk9UiM71vE5IDXieGAfOHSiXWokY8YbObPjyEKJh5Uf958fcrikRravyeadfCXi6O1z1DZclhqZkjhu4duJlKHEE9LqI5ee9DukRrauzjIYeKquQByDQ86KA61SI/GxY/I+nEIcSvx8HDze9sA+IDWyaUVGcFAAcfg/p8tTXndOamR8VNiXn84gDiX80njtpq1XamT98jnmsCDi8H8er6+sullqxBwetHb5bOJQwmnrzbbr3VIjhZ/NHBsZShxKKKm0St0+JChg04oM4lDChav3rK02qZHPF02Ne91CHErYWdXk80nc3mDQf70qiziUcO2G/dTZLqmRRfOSkieOJQ4llNU0ezzef397TdN9o+QlPVSMw3a/r+Fkh9TIW+nx6dNjiUMJ5fXnhkfcUiPb12YThxIe9QzuO3ZVamRmSvT87AnEoYS9h1qfDoxIjah2SQ9143j6bKTy8EWpkUnxkbkLkolDCfXHrth7BqVGNq/MNAYaiMP/DY+499TLvZUfM968fMk04lBCw8kO270+qZENBemhJiNx+D+Px1tWK/dWfoQlZPXSNOJQwqmzXR037FIjq5amRVhCiMP/+Xy60qomqZFQk3GjApf0IA6dTqezttrOX70rNbJsybSY8WbiUMLOSrnDwxho2FKUSRxKaLve/bv1ltTIJx8k+/clPYjjb6XVTR6vxAeB9JqWMmkccSjhlq33eON11oE4xHbXtThdHtaBOAQe2AcOHm9jHYhDrOJA67MhJ+tAHAJP+h3/x3+9Jw4/UdtwuadviHUgDoEhh6ti/wXWgTjEDp1ov9/9lDgg4HJ7fqhrIQ6InTjdeeNOD3FAwOvzlVY3EQfEzjTfvtLxkDggVrLXShwQu9h+/4/zd4gDYqVVzVKX9CAOhXTeevTrmU7igNj3NS1ut5c4IHD3Yf+R39qJA2J79l1wDLuIAwKPewd/OnqFOCBWdfhS/8AwcUBgYHBk78FW4oDYvp/buh89Iw4IjDjd5ZKX9Bi9tMR5u9hycHKAOEAcIA4QB4gDxAHiAHGAOADiAHGAOEAcIA4QB4gDxAHigFq0xrDprAI4OUAcIA4QB4gDxAHigD/QfGpeKA+cHCAOEAde8nMOXXwBqwBODhAHiAPEAeIAcWA0vZTl1+fg5ABxgDjwMp5z8KcJ4OQAcYA4QBwgDhAHRpe/AD/mVb/yjtspAAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2326418f'/%3E%3Ctext x='50' y='68' font-size='60' font-weight='bold' font-family='sans-serif' fill='white' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href='data:application/manifest+json,{"name":"NorGareth","short_name":"NorGareth","display":"standalone","background_color":"%23f4f5f9","theme_color":"%2326418f","start_url":"."}'>
+<style>
+:root{
+  --bg:#f4f5f9; --card:#ffffff; --ink:#1c2130; --muted:#6b7280;
+  --accent:#26418f; --accent-soft:#e5eaf7; --good:#1a7f4e; --good-soft:#e2f3ea;
+  --warn:#a05a00; --warn-soft:#fdf0dc; --bad:#b3261e; --bad-soft:#fbe7e6;
+  --border:#e2e5ee; --shadow:0 1px 3px rgba(20,30,60,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12151f; --card:#1c2130; --ink:#eef0f6; --muted:#9aa1b5;
+    --accent:#8fa7e8; --accent-soft:#26314f; --good:#5fc98f; --good-soft:#1c3328;
+    --warn:#e8b46a; --warn-soft:#3a2e1a; --bad:#f28b82; --bad-soft:#3d2422;
+    --border:#2b3247; --shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); font-size:16px; line-height:1.45;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom));
+}
+header{
+  background:var(--card); border-bottom:1px solid var(--border);
+  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+  position:sticky; top:0; z-index:10;
+}
+.hrow{display:flex; align-items:baseline; justify-content:space-between; max-width:640px; margin:0 auto;}
+.hrow h1{font-size:1.15rem; margin:0; letter-spacing:.2px;}
+.hrow h1 span{color:var(--accent);}
+#levelPill{font-size:.8rem; font-weight:600; color:var(--accent); background:var(--accent-soft); padding:2px 10px; border-radius:999px;}
+.pwrap{max-width:640px; margin:8px auto 0;}
+.pbar{height:6px; background:var(--accent-soft); border-radius:999px; overflow:hidden;}
+#pfill{height:100%; width:0%; background:var(--accent); border-radius:999px; transition:width .4s ease;}
+.psub{display:flex; justify-content:space-between; font-size:.72rem; color:var(--muted); margin-top:4px;}
+main{max-width:640px; margin:0 auto; padding:16px;}
+.view{display:none;}
+.view.active{display:block; animation:fadein .18s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:16px; margin-bottom:14px; box-shadow:var(--shadow);
+}
+.card h2{font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 10px;}
+.sentence{font-size:1.2rem; font-weight:600; min-height:1.5em;}
+textarea,input[type=text],input[type=password],select{
+  width:100%; font:inherit; color:var(--ink); background:var(--bg);
+  border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-top:10px;
+}
+textarea{resize:vertical; min-height:72px;}
+textarea:focus,input:focus,select:focus{outline:2px solid var(--accent); outline-offset:-1px;}
+button{
+  font:inherit; font-weight:600; border:none; border-radius:10px;
+  padding:10px 16px; cursor:pointer; background:var(--accent); color:#fff;
+}
+button:disabled{opacity:.5; cursor:default;}
+button.ghost{background:var(--accent-soft); color:var(--accent);}
+button.subtle{background:transparent; color:var(--muted); font-weight:500;}
+button.danger{background:var(--bad-soft); color:var(--bad);}
+.btnrow{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+.btnrow button{flex:1; min-width:110px;}
+.result{margin-top:14px; display:none;}
+.result.show{display:block;}
+.scoreline{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.scorebadge{font-size:1.05rem; font-weight:700; padding:4px 12px; border-radius:10px;}
+.scorebadge.good{background:var(--good-soft); color:var(--good);}
+.scorebadge.mid{background:var(--warn-soft); color:var(--warn);}
+.scorebadge.low{background:var(--bad-soft); color:var(--bad);}
+.errbox{background:var(--bad-soft); border-radius:10px; padding:10px 12px; margin-top:8px; font-size:.92rem;}
+.errbox b{color:var(--bad);}
+.nativebox{background:var(--good-soft); border-radius:10px; padding:10px 12px; margin-top:8px; font-size:.95rem;}
+.nativebox b{color:var(--good);}
+.notebox{color:var(--muted); font-size:.88rem; margin-top:8px;}
+.statline{font-size:.85rem; color:var(--muted); margin-bottom:10px;}
+/* vocab */
+.subtabs{display:flex; gap:8px; margin-bottom:12px;}
+.subtabs button{flex:1; background:var(--card); color:var(--muted); border:1px solid var(--border);}
+.subtabs button.on{background:var(--accent); color:#fff; border-color:var(--accent);}
+.dirtoggle{display:flex; justify-content:center; margin-bottom:12px;}
+.dirtoggle button{background:var(--accent-soft); color:var(--accent); font-size:.85rem; padding:6px 14px;}
+.flashcard{
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  min-height:170px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:20px; text-align:center; box-shadow:var(--shadow); margin-bottom:12px;
+}
+.flashcard .front{font-size:1.5rem; font-weight:700;}
+.flashcard .back{font-size:1.15rem; color:var(--accent); margin-top:10px; font-weight:600;}
+.gradebtns{display:none; gap:8px;}
+.gradebtns.show{display:flex;}
+.gradebtns button{flex:1; padding:12px 4px; font-size:.85rem;}
+.g-again{background:var(--bad-soft); color:var(--bad);}
+.g-hard{background:var(--warn-soft); color:var(--warn);}
+.g-good{background:var(--accent-soft); color:var(--accent);}
+.g-easy{background:var(--good-soft); color:var(--good);}
+.matchgrid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.matchgrid button{
+  background:var(--card); color:var(--ink); border:1px solid var(--border);
+  padding:14px 8px; font-weight:600; font-size:.95rem; min-height:52px;
+}
+.matchgrid button.sel{border-color:var(--accent); background:var(--accent-soft); color:var(--accent);}
+.matchgrid button.done{opacity:.25; pointer-events:none;}
+.matchgrid button.wrong{border-color:var(--bad); background:var(--bad-soft); color:var(--bad);}
+/* chat */
+#chatLog{display:flex; flex-direction:column; gap:10px; margin-bottom:12px; min-height:120px;}
+.msg{max-width:85%; padding:10px 14px; border-radius:16px; font-size:.97rem;}
+.msg.ai{background:var(--card); border:1px solid var(--border); align-self:flex-start; border-bottom-left-radius:4px;}
+.msg.me{background:var(--accent); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
+.msg.corr{background:var(--warn-soft); color:var(--ink); align-self:flex-end; font-size:.84rem; max-width:85%; border-radius:10px;}
+.msg.corr b{color:var(--warn);}
+.chatrow{display:flex; gap:8px;}
+.chatrow textarea{flex:1; min-height:44px; margin-top:0;}
+.chatrow button{align-self:flex-end;}
+/* settings */
+label{display:block; font-size:.85rem; font-weight:600; margin-top:14px; color:var(--muted);}
+label:first-child{margin-top:0;}
+/* nav */
+nav{
+  position:fixed; bottom:0; left:0; right:0; z-index:10;
+  background:var(--card); border-top:1px solid var(--border);
+  display:flex; padding-bottom:env(safe-area-inset-bottom);
+}
+nav button{
+  flex:1; background:none; color:var(--muted); font-size:.72rem; font-weight:600;
+  padding:8px 2px 10px; border-radius:0; display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+nav button svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+nav button.on{color:var(--accent);}
+/* toast */
+#toast{
+  position:fixed; left:50%; transform:translateX(-50%);
+  bottom:calc(76px + env(safe-area-inset-bottom));
+  background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:12px;
+  font-size:.9rem; font-weight:600; opacity:0; pointer-events:none; transition:opacity .25s;
+  max-width:90%; text-align:center; z-index:50;
+}
+#toast.show{opacity:1;}
+.spin{display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-2px; margin-right:6px;}
+button.ghost .spin,button.subtle .spin{border-color:var(--accent-soft); border-top-color:var(--accent);}
+@keyframes spin{to{transform:rotate(360deg);}}
+.hint{font-size:.82rem; color:var(--muted); margin-top:8px;}
+.bigstat{display:flex; gap:10px; margin-top:4px;}
+.bigstat div{flex:1; background:var(--bg); border-radius:10px; padding:10px; text-align:center;}
+.bigstat .n{font-size:1.3rem; font-weight:700; color:var(--accent);}
+.bigstat .l{font-size:.72rem; color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow"><h1>Nor<span>Gareth</span></h1><span id="levelPill">Level 1</span></div>
+  <div class="pwrap">
+    <div class="pbar"><div id="pfill"></div></div>
+    <div class="psub"><span id="plabel">A2</span><span id="ppct">0% to B1</span></div>
+  </div>
+</header>
+
+<main>
+
+<!-- TRANSLATE -->
+<section class="view active" id="view-translate">
+  <div class="card">
+    <h2>Translate to Norwegian</h2>
+    <div class="sentence" id="trEn">Tap "New sentence" to begin.</div>
+    <textarea id="trInput" placeholder="Skriv på norsk..." autocapitalize="sentences" autocomplete="off"></textarea>
+    <div class="btnrow">
+      <button id="trCheck">Check</button>
+      <button class="ghost" id="trNew">New sentence</button>
+    </div>
+    <div class="result" id="trResult"></div>
+  </div>
+</section>
+
+<!-- VOCAB -->
+<section class="view" id="view-vocab">
+  <div class="subtabs">
+    <button id="vtFlash" class="on">Flashcards</button>
+    <button id="vtMatch">Matching</button>
+  </div>
+  <div class="dirtoggle"><button id="vDir">Norwegian &rarr; English</button></div>
+  <div class="statline" id="vStats"></div>
+  <div id="vFlashArea">
+    <div class="flashcard" id="fcCard"><div class="front" id="fcFront">No cards yet</div><div class="back" id="fcBack" style="display:none"></div></div>
+    <div class="btnrow" id="fcRevealRow"><button id="fcReveal">Show answer</button></div>
+    <div class="gradebtns" id="fcGrades">
+      <button class="g-again" data-g="0">Again</button>
+      <button class="g-hard" data-g="3">Hard</button>
+      <button class="g-good" data-g="4">Good</button>
+      <button class="g-easy" data-g="5">Easy</button>
+    </div>
+    <div class="btnrow"><button class="subtle" id="fcPractice">Practice 10 random cards</button></div>
+  </div>
+  <div id="vMatchArea" style="display:none">
+    <div class="matchgrid" id="mGrid"></div>
+    <div class="btnrow"><button class="ghost" id="mNew">New round</button></div>
+    <div class="hint" id="mHint"></div>
+  </div>
+  <div class="card" id="seedCard" style="display:none">
+    <h2>Starter deck</h2>
+    <p style="margin:0 0 4px; font-size:.92rem;">Your deck is nearly empty. Seed it with 30 words picked for your level and topics; your mistakes in other modes will grow it from there.</p>
+    <div class="btnrow"><button id="seedBtn">Seed starter deck</button></div>
+  </div>
+</section>
+
+<!-- LISTEN -->
+<section class="view" id="view-listen">
+  <div class="card">
+    <h2>Listening</h2>
+    <p class="hint" id="liHint">Tap "New sentence", then Play, and type what you hear in Norwegian.</p>
+    <div class="btnrow">
+      <button id="liPlay" disabled>&#9654; Play</button>
+      <button class="ghost" id="liSlow" disabled>Slow</button>
+      <button class="ghost" id="liNew">New sentence</button>
+    </div>
+    <textarea id="liInput" placeholder="Skriv det du hørte..." autocapitalize="sentences" autocomplete="off"></textarea>
+    <div class="btnrow"><button id="liCheck" disabled>Check</button></div>
+    <div class="result" id="liResult"></div>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section class="view" id="view-chat">
+  <div id="chatLog"></div>
+  <div class="chatrow">
+    <textarea id="chInput" placeholder="Skriv på norsk..." autocapitalize="sentences"></textarea>
+    <button id="chSend">Send</button>
+  </div>
+  <div class="btnrow"><button class="subtle" id="chReset">Start a new conversation</button></div>
+</section>
+
+<!-- SETTINGS -->
+<section class="view" id="view-settings">
+  <div class="card">
+    <h2>Setup</h2>
+    <label for="sKey">Anthropic API key</label>
+    <input type="password" id="sKey" placeholder="sk-ant-..." autocomplete="off">
+    <label for="sDiff">Difficulty nudge</label>
+    <select id="sDiff">
+      <option value="easier">Easier</option>
+      <option value="standard" selected>Standard</option>
+      <option value="harder">Harder</option>
+    </select>
+    <label for="sTopics">Topics to draw from</label>
+    <textarea id="sTopics"></textarea>
+    <label for="sVoice">Norwegian voice</label>
+    <select id="sVoice"></select>
+    <div class="btnrow"><button id="sSave">Save settings</button></div>
+  </div>
+  <div class="card">
+    <h2>Progress</h2>
+    <div class="bigstat">
+      <div><div class="n" id="stCards">0</div><div class="l">cards in deck</div></div>
+      <div><div class="n" id="stEx">0</div><div class="l">exercises done</div></div>
+      <div><div class="n" id="stDays">0</div><div class="l">days practiced</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Backup</h2>
+    <p class="hint" style="margin-top:0">Your progress lives only on this device. Export a backup now and then, and import it on your other device to carry cards across. (The API key is not included in backups.)</p>
+    <div class="btnrow">
+      <button class="ghost" id="sExport">Export backup</button>
+      <button class="ghost" id="sImport">Import backup</button>
+      <input type="file" id="sImportFile" accept=".json" style="display:none">
+    </div>
+    <div class="btnrow"><button class="danger" id="sReset">Erase all data</button></div>
+  </div>
+</section>
+
+</main>
+
+<nav>
+  <button data-view="translate" class="on"><svg viewBox="0 0 24 24"><path d="M4 5h9M8.5 5v2.5c0 3-2 5.5-4.5 6.5M5.5 9c1 2.7 3.5 5 6.5 5.5M13 19l4-9 4 9M14.2 16.5h5.6"/></svg>Translate</button>
+  <button data-view="vocab"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="13" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13M7 10h5M7 14h5"/></svg>Vocab</button>
+  <button data-view="listen"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 6a9 9 0 0 1 0 12"/></svg>Listen</button>
+  <button data-view="chat"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/><path d="M8.5 11h.01M12.5 11h.01M16.5 11h.01"/></svg>Chat</button>
+  <button data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.1-1.3L14 3h-4l-.5 2.6a7 7 0 0 0-2.1 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.1 1.3L10 21h4l.5-2.6a7 7 0 0 0 2.1-1.3l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>Settings</button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   NorGareth v1
+   Single-file Norwegian (Bokmål) practice app.
+   All state in localStorage. AI: Anthropic API, claude-haiku-4-5.
+   ============================================================ */
+
+const STORE_KEY = "norgareth_v1";
+const KEY_KEY = "norgareth_apikey";
+const MODEL = "claude-haiku-4-5";
+const TOTAL_LEVELS = 300;
+const XP_PER_LEVEL = 100;
+const DEFAULT_TOPICS = "communications work at BSI (standards, corporate comms), rowing, weightlifting, reading, backgammon, everyday American life (errands, food, weather, travel)";
+
+const $ = id => document.getElementById(id);
+
+/* ---------- state ---------- */
+let S = {
+  settings: { difficulty: "standard", topics: DEFAULT_TOPICS, voiceURI: "" },
+  level: 1, xp: 0,
+  deck: [],            // {id,no,en,ef,reps,interval,due,added}
+  stats: { exercises: 0, days: {} },
+  recentEn: []         // last generated English sentences, to avoid repeats
+};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      S = Object.assign(S, d);
+      S.settings = Object.assign({ difficulty:"standard", topics:DEFAULT_TOPICS, voiceURI:"" }, d.settings || {});
+      S.stats = Object.assign({ exercises:0, days:{} }, d.stats || {});
+      if (!Array.isArray(S.deck)) S.deck = [];
+      if (!Array.isArray(S.recentEn)) S.recentEn = [];
+    }
+  } catch (e) { console.error("load failed", e); }
+}
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
+  catch (e) { toast("Could not save progress: " + e.message); }
+}
+function apiKey() { return localStorage.getItem(KEY_KEY) || ""; }
+
+function markDay() {
+  const d = new Date().toISOString().slice(0, 10);
+  if (!S.stats.days[d]) { S.stats.days[d] = 1; }
+}
+
+/* ---------- progress / levels ---------- */
+function cefrLabel(lvl) {
+  if (lvl <= 75) return "A2";
+  if (lvl <= 150) return "A2+";
+  if (lvl <= 225) return "B1 approaching";
+  if (lvl < TOTAL_LEVELS) return "B1 in sight";
+  return "B1";
+}
+function addXP(n) {
+  if (n <= 0) return;
+  S.xp += n;
+  let leveled = false;
+  while (S.xp >= XP_PER_LEVEL && S.level < TOTAL_LEVELS) {
+    S.xp -= XP_PER_LEVEL; S.level++; leveled = true;
+  }
+  if (S.level >= TOTAL_LEVELS) { S.level = TOTAL_LEVELS; S.xp = Math.min(S.xp, XP_PER_LEVEL); }
+  S.stats.exercises++;
+  markDay();
+  save();
+  renderProgress();
+  if (leveled) toast("Level up! Now level " + S.level + " (" + cefrLabel(S.level) + ")");
+}
+function renderProgress() {
+  $("levelPill").textContent = "Level " + S.level;
+  $("plabel").textContent = cefrLabel(S.level);
+  const total = ((S.level - 1) * XP_PER_LEVEL + S.xp) / (TOTAL_LEVELS * XP_PER_LEVEL);
+  const pct = Math.min(100, total * 100);
+  $("pfill").style.width = pct.toFixed(2) + "%";
+  $("ppct").textContent = pct < 100 ? pct.toFixed(1) + "% to B1" : "B1 reached!";
+}
+
+/* ---------- toast / busy ---------- */
+let toastTimer = null;
+function toast(msg, ms) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), ms || 3200);
+}
+function busy(btn, on, label) {
+  if (!btn) return;
+  if (on) {
+    btn.dataset.label = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>' + (label || "Thinking...");
+  } else {
+    btn.disabled = false;
+    if (btn.dataset.label) btn.innerHTML = btn.dataset.label;
+  }
+}
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+}
+
+/* ---------- Anthropic API ---------- */
+async function callClaude(system, messages, maxTokens) {
+  const key = apiKey();
+  if (!key) { throw new Error("No API key set. Add it in Settings."); }
+  let res;
+  try {
+    res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({ model: MODEL, max_tokens: maxTokens || 1000, system: system, messages: messages })
+    });
+  } catch (e) {
+    throw new Error("Network problem reaching the AI. Your progress is safe; try again.");
+  }
+  if (!res.ok) {
+    let detail = "";
+    try { const j = await res.json(); detail = (j.error && j.error.message) || ""; } catch (e) {}
+    if (res.status === 401) throw new Error("API key rejected. Check it in Settings.");
+    if (res.status === 429) throw new Error("Rate limited by the API. Wait a moment and try again.");
+    throw new Error("API error (" + res.status + "). " + detail);
+  }
+  const data = await res.json();
+  return (data.content && data.content[0] && data.content[0].text) || "";
+}
+function extractJSON(text) {
+  const a = text.indexOf("{"), b = text.lastIndexOf("}");
+  if (a === -1 || b === -1 || b <= a) throw new Error("The AI reply was not in the expected format. Try again.");
+  return JSON.parse(text.slice(a, b + 1));
+}
+async function callJSON(system, messages, maxTokens) {
+  const text = await callClaude(system, messages, maxTokens);
+  return extractJSON(text);
+}
+function promptContext() {
+  return "Learner: Gareth, level " + S.level + " of " + TOTAL_LEVELS + " (" + cefrLabel(S.level) +
+    ", lower-intermediate). Difficulty preference: " + S.settings.difficulty +
+    ". Topics to draw from naturally: " + S.settings.topics +
+    ". Always Bokmål, never Nynorsk. English text uses US spelling. Never use em dashes anywhere.";
+}
+
+/* ---------- SRS (SM-2) ---------- */
+function newCard(no, en) {
+  return { id: Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+    no: no.trim(), en: en.trim(), ef: 2.5, reps: 0, interval: 0, due: Date.now(), added: Date.now() };
+}
+function addCards(pairs) {
+  let added = 0;
+  for (const p of pairs || []) {
+    if (!p || !p.no || !p.en) continue;
+    const key = p.no.trim().toLowerCase();
+    if (!key || S.deck.some(c => c.no.trim().toLowerCase() === key)) continue;
+    S.deck.push(newCard(p.no, p.en));
+    added++;
+  }
+  if (added) { save(); renderVocabStats(); }
+  return added;
+}
+function gradeCard(card, q) {
+  // q: 0 again, 3 hard, 4 good, 5 easy
+  if (q < 3) {
+    card.reps = 0; card.interval = 0;
+    card.due = Date.now() + 10 * 60 * 1000; // 10 minutes
+  } else {
+    if (card.reps === 0) card.interval = 1;
+    else if (card.reps === 1) card.interval = 6;
+    else card.interval = Math.round(card.interval * card.ef);
+    card.ef = Math.max(1.3, card.ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
+    card.reps++;
+    card.due = Date.now() + card.interval * 24 * 60 * 60 * 1000;
+  }
+  save();
+}
+function dueCards() {
+  const now = Date.now();
+  return S.deck.filter(c => c.due <= now).sort((a, b) => a.due - b.due);
+}
+
+/* ---------- navigation ---------- */
+document.querySelectorAll("nav button").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    $("view-" + b.dataset.view).classList.add("active");
+    if (b.dataset.view === "vocab") { renderVocabStats(); refreshFlashQueue(); }
+    if (b.dataset.view === "settings") renderStats();
+  });
+});
+
+/* ============================================================
+   MODE 1: TRANSLATE
+   ============================================================ */
+let trCurrent = null;
+
+async function trNewSentence() {
+  const btn = $("trNew");
+  busy(btn, true, "Writing...");
+  try {
+    const avoid = S.recentEn.length ? " Avoid anything similar to these recent sentences: " + S.recentEn.join(" | ") : "";
+    const sys = "You write one short English practice sentence for a Norwegian learner to translate into Bokmål. " +
+      promptContext() +
+      " The sentence should be 8 to 16 words, natural, and include one level-appropriate grammar challenge (past tense, modal verbs, a subordinate clause, comparatives, etc.)." + avoid +
+      ' Respond with only JSON: {"english":"..."}';
+    const j = await callJSON(sys, [{ role: "user", content: "One new sentence, please." }], 300);
+    if (!j.english) throw new Error("No sentence returned. Try again.");
+    trCurrent = j.english;
+    S.recentEn.push(j.english);
+    if (S.recentEn.length > 15) S.recentEn.shift();
+    save();
+    $("trEn").textContent = trCurrent;
+    $("trInput").value = "";
+    $("trResult").classList.remove("show");
+    $("trInput").focus();
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+}
+
+async function trCheckAnswer() {
+  const ans = $("trInput").value.trim();
+  if (!trCurrent) { toast("Get a sentence first."); return; }
+  if (!ans) { toast("Write your Norwegian translation first."); return; }
+  const btn = $("trCheck");
+  busy(btn, true, "Marking...");
+  try {
+    const sys = "You are a precise, encouraging Norwegian Bokmål teacher marking a translation. " + promptContext() +
+      ' Mark the learner\'s Norwegian against the English. Respond with only JSON: ' +
+      '{"score": 0-100, "corrected": "the learner\'s answer with minimal fixes applied", ' +
+      '"errors": [{"issue": "3-6 word label", "explanation": "clear English explanation of the rule and why"}], ' +
+      '"native": "what a native speaker would most naturally say", ' +
+      '"comment": "one short honest sentence of feedback, not gushing", ' +
+      '"vocab": [{"no": "bokmål word or short phrase", "en": "english"}]} ' +
+      "vocab holds up to 3 items the learner got wrong or was missing, worth drilling; [] if none. " +
+      "If the answer is fully correct and natural, errors is [] and score is 95-100. " +
+      "Word-order, gender, and preposition slips all deserve an errors entry. Explanations teach; never just restate the fix.";
+    const j = await callJSON(sys, [{ role: "user", content: "English: " + trCurrent + "\nLearner's Norwegian: " + ans }], 1200);
+    renderMarking($("trResult"), j);
+    const gained = addCards(j.vocab);
+    if (gained) toast(gained + (gained === 1 ? " word" : " words") + " added to your deck");
+    addXP(Math.max(1, Math.round((j.score || 0) / 10)));
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+}
+
+function renderMarking(el, j) {
+  const score = Math.max(0, Math.min(100, j.score || 0));
+  const cls = score >= 85 ? "good" : score >= 55 ? "mid" : "low";
+  let html = '<div class="scoreline"><span class="scorebadge ' + cls + '">' + score + '</span>' +
+    '<span style="font-size:.92rem">' + esc(j.comment || "") + "</span></div>";
+  for (const e of j.errors || []) {
+    html += '<div class="errbox"><b>' + esc(e.issue) + ":</b> " + esc(e.explanation) + "</div>";
+  }
+  if (j.corrected && (j.errors || []).length) {
+    html += '<div class="notebox">Corrected: ' + esc(j.corrected) + "</div>";
+  }
+  if (j.native) html += '<div class="nativebox"><b>A native would say:</b> ' + esc(j.native) + "</div>";
+  el.innerHTML = html;
+  el.classList.add("show");
+}
+
+$("trNew").addEventListener("click", trNewSentence);
+$("trCheck").addEventListener("click", trCheckAnswer);
+
+/* ============================================================
+   MODE 2: VOCABULARY (flashcards + matching)
+   ============================================================ */
+let vDir = "no-en";       // or "en-no"
+let flashQueue = [];
+let flashCard = null;
+
+function renderVocabStats() {
+  const due = dueCards().length;
+  $("vStats").textContent = S.deck.length + " cards in deck, " + due + " due for review";
+  $("seedCard").style.display = S.deck.length < 10 ? "" : "none";
+}
+function dirLabel() { return vDir === "no-en" ? "Norwegian → English" : "English → Norwegian"; }
+
+$("vDir").addEventListener("click", () => {
+  vDir = vDir === "no-en" ? "en-no" : "no-en";
+  $("vDir").textContent = dirLabel();
+  showFlashCard();
+});
+$("vtFlash").addEventListener("click", () => switchVocabTab("flash"));
+$("vtMatch").addEventListener("click", () => switchVocabTab("match"));
+function switchVocabTab(t) {
+  $("vtFlash").classList.toggle("on", t === "flash");
+  $("vtMatch").classList.toggle("on", t === "match");
+  $("vFlashArea").style.display = t === "flash" ? "" : "none";
+  $("vMatchArea").style.display = t === "match" ? "" : "none";
+  if (t === "flash") refreshFlashQueue();
+  else newMatchRound();
+}
+
+function refreshFlashQueue() {
+  flashQueue = dueCards().slice(0, 20);
+  nextFlashCard();
+}
+function nextFlashCard() {
+  flashCard = flashQueue.shift() || null;
+  showFlashCard();
+}
+function showFlashCard() {
+  const front = $("fcFront"), back = $("fcBack");
+  back.style.display = "none";
+  $("fcGrades").classList.remove("show");
+  $("fcRevealRow").style.display = "";
+  if (!flashCard) {
+    front.textContent = S.deck.length === 0 ? "No cards yet. Seed the starter deck below, or make some mistakes in the other modes!" : "Nothing due right now. Nice.";
+    $("fcRevealRow").style.display = "none";
+    return;
+  }
+  front.textContent = vDir === "no-en" ? flashCard.no : flashCard.en;
+  back.textContent = vDir === "no-en" ? flashCard.en : flashCard.no;
+}
+$("fcReveal").addEventListener("click", () => {
+  if (!flashCard) return;
+  $("fcBack").style.display = "";
+  $("fcRevealRow").style.display = "none";
+  $("fcGrades").classList.add("show");
+});
+document.querySelectorAll("#fcGrades button").forEach(b => {
+  b.addEventListener("click", () => {
+    if (!flashCard) return;
+    const q = parseInt(b.dataset.g, 10);
+    gradeCard(flashCard, q);
+    if (q === 0) flashQueue.push(flashCard); // see it again this session
+    addXP(q >= 4 ? 2 : 1);
+    renderVocabStats();
+    nextFlashCard();
+  });
+});
+$("fcPractice").addEventListener("click", () => {
+  if (S.deck.length === 0) { toast("The deck is empty. Seed it first."); return; }
+  flashQueue = [...S.deck].sort(() => Math.random() - 0.5).slice(0, 10);
+  nextFlashCard();
+});
+
+/* ----- matching pairs ----- */
+let mCards = [], mSel = null, mWrong = {}, mDone = 0;
+
+function newMatchRound() {
+  const due = dueCards();
+  const pool = due.length >= 5 ? due : [...S.deck].sort(() => Math.random() - 0.5);
+  mCards = pool.slice(0, 5);
+  mSel = null; mWrong = {}; mDone = 0;
+  const grid = $("mGrid");
+  grid.innerHTML = "";
+  $("mHint").textContent = "";
+  if (mCards.length < 2) {
+    $("mHint").textContent = "You need at least 2 cards in the deck for matching. Seed the starter deck in Flashcards.";
+    return;
+  }
+  const left = [...mCards].sort(() => Math.random() - 0.5);
+  const right = [...mCards].sort(() => Math.random() - 0.5);
+  const leftKey = vDir === "no-en" ? "no" : "en";
+  const rightKey = vDir === "no-en" ? "en" : "no";
+  const maxRows = Math.max(left.length, right.length);
+  for (let i = 0; i < maxRows; i++) {
+    grid.appendChild(matchBtn(left[i], leftKey, "L"));
+    grid.appendChild(matchBtn(right[i], rightKey, "R"));
+  }
+}
+function matchBtn(card, key, side) {
+  const b = document.createElement("button");
+  b.textContent = card[key];
+  b.dataset.id = card.id;
+  b.dataset.side = side;
+  b.addEventListener("click", () => matchTap(b, card));
+  return b;
+}
+function matchTap(btn, card) {
+  if (btn.classList.contains("done")) return;
+  if (!mSel) {
+    mSel = btn;
+    btn.classList.add("sel");
+    return;
+  }
+  if (mSel === btn) { btn.classList.remove("sel"); mSel = null; return; }
+  if (mSel.dataset.side === btn.dataset.side) {
+    mSel.classList.remove("sel"); mSel = btn; btn.classList.add("sel"); return;
+  }
+  const a = mSel;
+  mSel = null;
+  a.classList.remove("sel");
+  if (a.dataset.id === btn.dataset.id) {
+    a.classList.add("done"); btn.classList.add("done");
+    mDone++;
+    const c = S.deck.find(x => x.id === card.id);
+    if (c) gradeCard(c, mWrong[card.id] ? 3 : 4);
+    addXP(1);
+    if (mDone === mCards.length) {
+      $("mHint").textContent = "Round complete! Tap New round to keep going.";
+      renderVocabStats();
+    }
+  } else {
+    mWrong[a.dataset.id] = true;
+    mWrong[btn.dataset.id] = true;
+    a.classList.add("wrong"); btn.classList.add("wrong");
+    setTimeout(() => { a.classList.remove("wrong"); btn.classList.remove("wrong"); }, 450);
+  }
+}
+$("mNew").addEventListener("click", newMatchRound);
+
+/* ----- seed starter deck ----- */
+$("seedBtn").addEventListener("click", async () => {
+  const btn = $("seedBtn");
+  busy(btn, true, "Building deck...");
+  try {
+    const sys = "You build a starter flashcard deck for a Norwegian Bokmål learner. " + promptContext() +
+      " Create exactly 30 cards: about 20 high-frequency everyday words or short phrases slightly above the learner's comfort zone, and about 10 drawn from the learner's topics. No absolute beginner words (not hei, takk, ja). " +
+      ' Respond with only JSON: {"cards":[{"no":"...","en":"..."}]}';
+    const j = await callJSON(sys, [{ role: "user", content: "Build my starter deck." }], 2500);
+    const n = addCards(j.cards);
+    toast(n + " cards added");
+    renderVocabStats();
+    refreshFlashQueue();
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+});
+/* ============================================================
+   MODE 3: LISTENING
+   ============================================================ */
+let liCurrent = null;   // {norwegian, english}
+let noVoice = null;
+
+function pickVoices() {
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const nb = voices.filter(v => /^(nb|no|nn)/i.test(v.lang));
+  const sel = $("sVoice");
+  sel.innerHTML = "";
+  if (nb.length === 0) {
+    sel.innerHTML = "<option value=''>No Norwegian voice found on this device</option>";
+    noVoice = null;
+    return;
+  }
+  for (const v of nb) {
+    const o = document.createElement("option");
+    o.value = v.voiceURI;
+    o.textContent = v.name + " (" + v.lang + ")";
+    sel.appendChild(o);
+  }
+  const saved = nb.find(v => v.voiceURI === S.settings.voiceURI);
+  noVoice = saved || nb.find(v => /^nb/i.test(v.lang)) || nb[0];
+  sel.value = noVoice.voiceURI;
+}
+if (window.speechSynthesis) {
+  speechSynthesis.onvoiceschanged = pickVoices;
+}
+
+function speak(text, rate) {
+  if (!window.speechSynthesis) { toast("This browser has no speech synthesis."); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "nb-NO";
+  if (noVoice) u.voice = noVoice;
+  u.rate = rate || 1;
+  speechSynthesis.speak(u);
+}
+
+async function liNewSentence() {
+  const btn = $("liNew");
+  busy(btn, true, "Writing...");
+  try {
+    const sys = "You write one short Norwegian Bokmål sentence for a listening dictation exercise. " + promptContext() +
+      " 6 to 12 words, natural spoken Norwegian, level-appropriate." +
+      ' Respond with only JSON: {"norwegian":"...","english":"..."}';
+    const j = await callJSON(sys, [{ role: "user", content: "One new dictation sentence." }], 300);
+    if (!j.norwegian) throw new Error("No sentence returned. Try again.");
+    liCurrent = j;
+    $("liInput").value = "";
+    $("liResult").classList.remove("show");
+    $("liPlay").disabled = false;
+    $("liSlow").disabled = false;
+    $("liCheck").disabled = false;
+    $("liHint").textContent = "Ready. Tap Play, listen, and type what you heard.";
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+}
+
+async function liCheckAnswer() {
+  const ans = $("liInput").value.trim();
+  if (!liCurrent) return;
+  if (!ans) { toast("Type what you heard first."); return; }
+  const btn = $("liCheck");
+  busy(btn, true, "Marking...");
+  try {
+    const sys = "You mark a Norwegian listening dictation. " + promptContext() +
+      " Compare what the learner typed to the actual sentence. Small spelling slips matter less than missed or wrong words. " +
+      ' Respond with only JSON: {"score":0-100,' +
+      '"errors":[{"issue":"3-6 word label","explanation":"what was missed or misheard and why it matters, in English"}],' +
+      '"comment":"one short honest sentence",' +
+      '"vocab":[{"no":"...","en":"..."}]} ' +
+      "vocab holds up to 3 missed words worth drilling; [] if none. Include the sentence's English meaning in the first error explanation only if the learner was far off.";
+    const j = await callJSON(sys, [{ role: "user", content: "Actual sentence: " + liCurrent.norwegian + "\nLearner typed: " + ans }], 1000);
+    renderMarking($("liResult"), j);
+    $("liResult").insertAdjacentHTML("beforeend",
+      '<div class="nativebox"><b>The sentence was:</b> ' + esc(liCurrent.norwegian) +
+      '<br><span style="font-size:.85rem">' + esc(liCurrent.english || "") + "</span></div>");
+    const gained = addCards(j.vocab);
+    if (gained) toast(gained + (gained === 1 ? " word" : " words") + " added to your deck");
+    addXP(Math.max(1, Math.round((j.score || 0) / 10)));
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+}
+
+$("liNew").addEventListener("click", liNewSentence);
+$("liPlay").addEventListener("click", () => liCurrent && speak(liCurrent.norwegian, 1));
+$("liSlow").addEventListener("click", () => liCurrent && speak(liCurrent.norwegian, 0.72));
+$("liCheck").addEventListener("click", liCheckAnswer);
+
+/* ============================================================
+   MODE 4: CONVERSATION
+   ============================================================ */
+let chatHistory = [];   // [{role, content}] as sent to the API
+let chatBusy = false;
+
+function chatBubble(cls, html) {
+  const d = document.createElement("div");
+  d.className = "msg " + cls;
+  d.innerHTML = html;
+  $("chatLog").appendChild(d);
+  d.scrollIntoView({ behavior: "smooth", block: "end" });
+}
+function chatSystem() {
+  return "You are Nora, a warm Norwegian conversation partner chatting with Gareth. " + promptContext() +
+    " Reply in natural Bokmål pitched at his level, 1 to 3 sentences, and keep the conversation moving; ask a question roughly every other turn. Vary topics using his interests. " +
+    ' Respond with only JSON: {"reply":"your Bokmål reply","correction":""} ' +
+    "If Gareth's most recent message contains Norwegian errors, set correction to a brief English note: the main error, why it's wrong, and the natural phrasing. If his Norwegian was fine, correction is an empty string. Ignore trivial typos.";
+}
+async function chatSend(userText) {
+  if (chatBusy) return;
+  chatBusy = true;
+  const btn = $("chSend");
+  busy(btn, true, "...");
+  try {
+    if (userText) chatHistory.push({ role: "user", content: userText });
+    else chatHistory.push({ role: "user", content: "(Start the conversation with a friendly opener.)" });
+    const recent = chatHistory.slice(-12);
+    const j = await callJSON(chatSystem(), recent, 800);
+    chatHistory.push({ role: "assistant", content: JSON.stringify(j) });
+    if (userText && j.correction) {
+      chatBubble("corr", "<b>Note:</b> " + esc(j.correction));
+    }
+    chatBubble("ai", esc(j.reply || "..."));
+    if (userText) addXP(2);
+  } catch (e) {
+    chatHistory.pop();
+    toast(e.message);
+  }
+  busy(btn, false);
+  chatBusy = false;
+}
+$("chSend").addEventListener("click", () => {
+  const t = $("chInput").value.trim();
+  if (!t) { if (chatHistory.length === 0) chatSend(null); return; }
+  chatBubble("me", esc(t));
+  $("chInput").value = "";
+  chatSend(t);
+});
+$("chInput").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("chSend").click(); }
+});
+$("chReset").addEventListener("click", () => {
+  chatHistory = [];
+  $("chatLog").innerHTML = "";
+  chatSend(null);
+});
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+function renderStats() {
+  $("stCards").textContent = S.deck.length;
+  $("stEx").textContent = S.stats.exercises;
+  $("stDays").textContent = Object.keys(S.stats.days).length;
+}
+function loadSettingsUI() {
+  $("sKey").value = apiKey();
+  $("sDiff").value = S.settings.difficulty;
+  $("sTopics").value = S.settings.topics;
+  pickVoices();
+}
+$("sSave").addEventListener("click", () => {
+  const k = $("sKey").value.trim();
+  if (k) localStorage.setItem(KEY_KEY, k);
+  S.settings.difficulty = $("sDiff").value;
+  S.settings.topics = $("sTopics").value.trim() || DEFAULT_TOPICS;
+  S.settings.voiceURI = $("sVoice").value;
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  noVoice = voices.find(v => v.voiceURI === S.settings.voiceURI) || noVoice;
+  save();
+  toast("Settings saved");
+});
+$("sExport").addEventListener("click", () => {
+  const data = JSON.stringify(S, null, 1);
+  const blob = new Blob([data], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "norgareth-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  toast("Backup downloaded");
+});
+$("sImport").addEventListener("click", () => $("sImportFile").click());
+$("sImportFile").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d || !Array.isArray(d.deck)) throw new Error("That does not look like a NorGareth backup.");
+      // merge: keep the higher level, union the decks (imported card wins on conflict)
+      const byNo = {};
+      for (const c of S.deck) byNo[c.no.trim().toLowerCase()] = c;
+      for (const c of d.deck) if (c && c.no && c.en) byNo[c.no.trim().toLowerCase()] = c;
+      S.deck = Object.values(byNo);
+      if ((d.level || 1) > S.level || ((d.level || 1) === S.level && (d.xp || 0) > S.xp)) {
+        S.level = d.level || 1; S.xp = d.xp || 0;
+      }
+      if (d.stats) {
+        S.stats.exercises = Math.max(S.stats.exercises, d.stats.exercises || 0);
+        Object.assign(S.stats.days, d.stats.days || {});
+      }
+      if (d.settings) {
+        S.settings.topics = d.settings.topics || S.settings.topics;
+        S.settings.difficulty = d.settings.difficulty || S.settings.difficulty;
+      }
+      save();
+      renderProgress(); renderStats(); renderVocabStats(); loadSettingsUI();
+      toast("Backup imported and merged");
+    } catch (err) { toast("Import failed: " + err.message); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+});
+$("sReset").addEventListener("click", () => {
+  if (!confirm("Erase ALL NorGareth data on this device? Export a backup first if in doubt.")) return;
+  if (!confirm("Really erase everything, including your deck and level?")) return;
+  localStorage.removeItem(STORE_KEY);
+  localStorage.removeItem(KEY_KEY);
+  location.reload();
+});
+
+/* ---------- init ---------- */
+load();
+renderProgress();
+renderVocabStats();
+loadSettingsUI();
+if (!apiKey()) {
+  setTimeout(() => {
+    toast("Welcome! Add your Anthropic API key in Settings to get started.", 5000);
+  }, 600);
+}
+</script>
+</body>
+</html>

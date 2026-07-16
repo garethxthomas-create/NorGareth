@@ -67,7 +67,12 @@ main{max-width:640px; margin:0 auto; padding:16px;}
 }
 .card h2{font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 10px;}
 .sentence{font-size:1.2rem; font-weight:600; min-height:1.5em;}
-.passage{font-size:1.02rem; line-height:1.6;}
+.passage{font-size:1.02rem; line-height:1.7;}
+.passage .w{cursor:pointer; border-radius:4px; padding:0 1px;}
+.passage .w.selword{background:var(--accent-soft); color:var(--accent);}
+.lookup{background:var(--accent-soft); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:.92rem;}
+.lookup b{color:var(--accent);}
+.lookup .addbtn{margin-top:8px; padding:6px 12px; font-size:.82rem; background:var(--accent); color:#fff;}
 textarea,input[type=text],input[type=password],select{
   width:100%; font:inherit; color:var(--ink); background:var(--bg);
   border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-top:10px;
@@ -309,14 +314,18 @@ button.ghost .spin,button.subtle .spin,button.chip .spin{border-color:var(--acce
 <section class="view" id="view-read">
   <div class="card">
     <h2>Reading</h2>
-    <p class="hint" id="rdHint" style="margin-top:0">A short Norwegian text at your level, with questions. Texts get longer as you level up.</p>
+    <p class="hint" id="rdHint" style="margin-top:0">A short Norwegian text at your level, with questions. Tap Listen to hear it read aloud, and tap any word to look it up. Texts get longer as you level up.</p>
     <div class="btnrow"><button id="rdNew">New text</button></div>
   </div>
   <div id="rdArea" style="display:none">
     <div class="card">
+      <div class="btnrow" style="margin-top:0; margin-bottom:12px">
+        <button class="ghost" id="rdPlay">&#9654; Listen</button>
+        <button class="ghost" id="rdSlow">Slow</button>
+      </div>
       <div class="passage" id="rdPassage"></div>
-      <h2 style="margin-top:14px">Tricky words</h2>
-      <div class="chips" id="rdGloss"></div>
+      <div class="hint">Tap any word to look it up.</div>
+      <div class="lookup" id="rdLookup" style="display:none"></div>
       <div id="rdQs"></div>
       <div class="nativebox" id="rdScore" style="display:none"></div>
     </div>
@@ -388,8 +397,9 @@ button.ghost .spin,button.subtle .spin,button.chip .spin{border-color:var(--acce
       <option value="phrases" selected>Words and short phrases</option>
       <option value="words">Single words only</option>
     </select>
-    <label for="sTopics">Topics to draw from</label>
+    <label for="sTopics">Your personal topics</label>
     <textarea id="sTopics"></textarea>
+    <p class="hint">These are mixed automatically with core learner themes like numbers, dates and times, directions, feelings, and making plans, so your practice covers the essentials too.</p>
     <label for="sVoice">Norwegian voice</label>
     <select id="sVoice"></select>
     <div class="btnrow"><button id="sSave">Save settings</button></div>
@@ -454,6 +464,7 @@ let S = {
   deck: [],            // {id,no,en,ef,reps,interval,due,added,lapses}
   stats: { exercises: 0, days: {} },
   recentEn: [],        // last generated English sentences, to avoid repeats
+  recentThemes: [],    // last used themes, to force variety
   grammarLog: {},      // {tag: count}
   gate: { pending: false, level: 0 }
 };
@@ -470,6 +481,7 @@ function load() {
       S.gate = d.gate || { pending: false, level: 0 };
       if (!Array.isArray(S.deck)) S.deck = [];
       if (!Array.isArray(S.recentEn)) S.recentEn = [];
+      if (!Array.isArray(S.recentThemes)) S.recentThemes = [];
       for (const c of S.deck) { if (c.lapses == null) c.lapses = 0; }
     }
   } catch (e) { console.error("load failed", e); }
@@ -599,6 +611,53 @@ function vocabSpec() {
 }
 const TAG_LIST = "word order, subordinate clauses, verb tense, verb form, adjective agreement, noun gender or article, definite form, preposition, pronoun, plural, question formation, vocabulary choice, spelling, other";
 
+/* ---------- theme variety ---------- */
+const CORE_THEMES = [
+  "numbers, prices, and quantities",
+  "dates, times, and schedules",
+  "directions and getting around",
+  "health and the body",
+  "clothes and shopping",
+  "food and cooking",
+  "family and relationships",
+  "feelings and opinions",
+  "making plans and the future",
+  "childhood and memories",
+  "weather and seasons",
+  "house and home",
+  "travel and transport",
+  "work small talk and meetings",
+  "making requests and asking politely",
+  "comparing and choosing between things"
+];
+const STORY_STYLES = [
+  "a short news item",
+  "a dialogue between two people",
+  "a personal anecdote",
+  "an email or message",
+  "a travel story",
+  "a sports report",
+  "a how-to or set of instructions",
+  "a diary entry",
+  "a phone conversation",
+  "a short opinion piece",
+  "an announcement for a local event",
+  "a story where something goes slightly wrong"
+];
+function pickTheme() {
+  const personal = S.settings.topics.split(/[,;]/).map(s => s.trim()).filter(Boolean);
+  const pool = (Math.random() < 0.5 && personal.length) ? personal : CORE_THEMES;
+  const avoid = new Set(S.recentThemes);
+  const fresh = pool.filter(t => !avoid.has(t));
+  const list = fresh.length ? fresh : pool;
+  return list[Math.floor(Math.random() * list.length)];
+}
+function noteTheme(t) {
+  S.recentThemes.push(t);
+  if (S.recentThemes.length > 8) S.recentThemes.shift();
+  save();
+}
+
 /* ---------- shared marking ---------- */
 async function markTranslation(english, norwegian, extraNote) {
   const sys = "You are a precise, encouraging Norwegian Bokmål teacher marking a translation. " + promptContext() +
@@ -709,9 +768,12 @@ async function trNewSentence() {
   busy(btn, true, "Writing...");
   try {
     const avoid = S.recentEn.length ? " Avoid anything similar to these recent sentences: " + S.recentEn.join(" | ") : "";
+    const theme = pickTheme();
+    noteTheme(theme);
     const sys = "You write one short English practice sentence for a Norwegian learner to translate into Bokmål. " +
       promptContext() +
-      " The sentence should be 8 to 16 words, natural, and include one level-appropriate grammar challenge (past tense, modal verbs, a subordinate clause, comparatives, etc.)." + avoid +
+      " Theme for this sentence: " + theme + "." +
+      " The sentence should be 8 to 16 words, natural and specific (real details, not generic filler), and include one level-appropriate grammar challenge (past tense, modal verbs, a subordinate clause, comparatives, etc.)." + avoid +
       ' Respond with only JSON: {"english":"..."}';
     const j = await callJSON(sys, [{ role: "user", content: "One new sentence, please." }], 300);
     if (!j.english) throw new Error("No sentence returned. Try again.");
@@ -1065,11 +1127,14 @@ $("rdNew").addEventListener("click", async () => {
   const btn = $("rdNew");
   busy(btn, true, "Writing...");
   try {
+    const style = STORY_STYLES[Math.floor(Math.random() * STORY_STYLES.length)];
+    const theme = pickTheme();
+    noteTheme(theme);
     const sys = "You write a short Norwegian Bokmål reading text with comprehension questions. " + promptContext() +
-      " The text: about " + readTargetWords() + " words, natural and interesting, on one of the learner's topics, level-appropriate. " +
+      " Format: " + style + ". Theme: " + theme + ". About " + readTargetWords() + " words, level-appropriate. " +
+      "Make it specific and lively, with concrete details such as names, numbers, times, and places. Absolutely avoid generic everyday filler like walking the dog or buying milk at the store. A little humor or tension is welcome. " +
       "Then 3 multiple-choice comprehension questions IN NORWEGIAN, each with exactly 3 options and one correct answer. Make wrong options plausible. " +
-      "Also pick the 3 hardest words or phrases from the text as a glossary. " +
-      ' Respond with only JSON: {"passage":"...","glossary":[{"no":"...","en":"..."}],"questions":[{"q":"...","options":["...","...","..."],"answer":0,"why":"one short English sentence explaining the answer"}]}';
+      ' Respond with only JSON: {"passage":"...","questions":[{"q":"...","options":["...","...","..."],"answer":0,"why":"one short English sentence explaining the answer"}]}';
     const j = await callJSON(sys, [{ role: "user", content: "One new reading text, please." }], 2200);
     if (!j.passage || !j.questions) throw new Error("No text returned. Try again.");
     rdCurrent = j; rdAnswered = 0; rdCorrect = 0;
@@ -1079,20 +1144,19 @@ $("rdNew").addEventListener("click", async () => {
 });
 function renderReading() {
   $("rdArea").style.display = "";
-  $("rdPassage").textContent = rdCurrent.passage;
   $("rdScore").style.display = "none";
-  const gl = $("rdGloss");
-  gl.innerHTML = "";
-  for (const g of rdCurrent.glossary || []) {
-    const b = document.createElement("button");
-    b.className = "chip";
-    b.textContent = g.no + " = " + g.en + "  +";
-    b.addEventListener("click", () => {
-      const n = addCards([g]);
-      toast(n ? "Added to deck" : "Already in your deck");
-    });
-    gl.appendChild(b);
-  }
+  $("rdLookup").style.display = "none";
+  const p = $("rdPassage");
+  p.innerHTML = "";
+  rdCurrent.passage.split(/(\s+)/).forEach(tok => {
+    if (!tok) return;
+    if (/^\s+$/.test(tok)) { p.appendChild(document.createTextNode(tok)); return; }
+    const span = document.createElement("span");
+    span.className = "w";
+    span.textContent = tok;
+    span.addEventListener("click", () => lookupWord(tok, span));
+    p.appendChild(span);
+  });
   const qs = $("rdQs");
   qs.innerHTML = "";
   rdCurrent.questions.forEach((q, qi) => {
@@ -1136,6 +1200,45 @@ function answerReading(q, chosen, optsEl, whyEl) {
   }
 }
 
+/* ----- reading: audio + tap-to-look-up ----- */
+$("rdPlay").addEventListener("click", () => rdCurrent && speakLong(rdCurrent.passage, 1));
+$("rdSlow").addEventListener("click", () => rdCurrent && speakLong(rdCurrent.passage, 0.72));
+
+let lookupBusy = false;
+async function lookupWord(token, span) {
+  if (lookupBusy) return;
+  const word = token.replace(/^[^\wåøæÅØÆ]+|[^\wåøæÅØÆ]+$/g, "");
+  if (!word) return;
+  document.querySelectorAll(".passage .w.selword").forEach(x => x.classList.remove("selword"));
+  span.classList.add("selword");
+  const box = $("rdLookup");
+  box.style.display = "";
+  box.innerHTML = "Looking up <b>" + esc(word) + "</b>...";
+  lookupBusy = true;
+  try {
+    const idx = rdCurrent.passage.indexOf(token);
+    const context = rdCurrent.passage.slice(Math.max(0, idx - 120), idx + 140);
+    const sys = "You are a Norwegian-English dictionary that understands context. " +
+      "Given a Bokmål word and the sentence it appears in, explain it. Use US spelling. Never use em dashes. " +
+      ' Respond with only JSON: {"no":"the dictionary (base) form","en":"meaning in this exact context","note":"very short grammar note, e.g. neuter noun; preteritum of å gå; plural of bok"}';
+    const j = await callJSON(sys, [{ role: "user", content: "Word: " + word + "\nContext: ..." + context + "..." }], 300);
+    box.innerHTML = "<b>" + esc(j.no || word) + "</b> = " + esc(j.en || "?") +
+      (j.note ? '<br><span style="font-size:.82rem">' + esc(j.note) + "</span>" : "");
+    const add = document.createElement("button");
+    add.className = "addbtn";
+    add.textContent = "Add to deck";
+    add.addEventListener("click", () => {
+      const n = addCards([{ no: j.no || word, en: j.en || "" }]);
+      toast(n ? "Added to deck" : "Already in your deck");
+    });
+    box.appendChild(document.createElement("br"));
+    box.appendChild(add);
+  } catch (e) {
+    box.innerHTML = "Lookup failed: " + esc(e.message);
+  }
+  lookupBusy = false;
+}
+
 /* ============================================================
    MODE 5: LISTENING (length scales with level)
    ============================================================ */
@@ -1174,6 +1277,21 @@ function speak(text, rate) {
   u.rate = rate || 1;
   speechSynthesis.speak(u);
 }
+function speakLong(text, rate) {
+  // Queue sentence by sentence: more reliable than one long utterance, especially on iOS.
+  if (!canSpeak()) { toast("This browser has no speech synthesis."); return; }
+  speechSynthesis.cancel();
+  const parts = text.match(/[^.!?]+[.!?]*/g) || [text];
+  for (const part of parts) {
+    const s = part.trim();
+    if (!s) continue;
+    const u = new SpeechSynthesisUtterance(s);
+    u.lang = "nb-NO";
+    if (noVoice) u.voice = noVoice;
+    u.rate = rate || 1;
+    speechSynthesis.speak(u);
+  }
+}
 function listenSpec() {
   const words = Math.min(18, 6 + Math.floor(S.level / 12));
   const sentences = S.level >= 80 ? 2 : 1;
@@ -1185,8 +1303,10 @@ async function liNewSentence() {
   const btn = $("liNew");
   busy(btn, true, "Writing...");
   try {
+    const theme = pickTheme();
+    noteTheme(theme);
     const sys = "You write Norwegian Bokmål for a listening dictation exercise. " + promptContext() +
-      " " + listenSpec() + " Natural spoken Norwegian, level-appropriate." +
+      " Theme: " + theme + ". " + listenSpec() + " Natural spoken Norwegian, level-appropriate, specific rather than generic." +
       ' Respond with only JSON: {"norwegian":"...","english":"..."}';
     const j = await callJSON(sys, [{ role: "user", content: "One new dictation item." }], 400);
     if (!j.norwegian) throw new Error("No sentence returned. Try again.");

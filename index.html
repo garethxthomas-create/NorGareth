@@ -433,6 +433,17 @@ details.syl summary{cursor:pointer; font-weight:600; font-size:.9rem; padding:10
     <div id="sylList"></div>
   </div>
   <div class="card">
+    <h2>Sync across devices</h2>
+    <p class="hint" style="margin-top:0">Keeps your deck, level, and syllabus progress identical on laptop and phone via a private GitHub Gist. Paste the same GitHub token on both devices and tap Connect. The Anthropic API key is never synced.</p>
+    <label for="sGhToken">GitHub token (gist scope only)</label>
+    <input type="password" id="sGhToken" placeholder="ghp_..." autocomplete="off">
+    <div class="btnrow">
+      <button id="syncConnect">Connect</button>
+      <button class="ghost" id="syncNowBtn">Sync now</button>
+    </div>
+    <div class="hint" id="syncStatus">Not connected.</div>
+  </div>
+  <div class="card">
     <h2>Backup</h2>
     <p class="hint" style="margin-top:0">Your progress lives only on this device. Export a backup now and then, and import it on your other device to carry cards across. (The API key is not included in backups.)</p>
     <div class="btnrow">
@@ -510,8 +521,9 @@ function load() {
     }
   } catch (e) { console.error("load failed", e); }
 }
+let syncDirty = false;
 function save() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); syncDirty = true; }
   catch (e) { toast("Could not save progress: " + e.message); }
 }
 function apiKey() { return localStorage.getItem(KEY_KEY) || ""; }
@@ -1876,6 +1888,127 @@ function finishPlacement() {
 $("tBack").addEventListener("click", () => showView("translate"));
 
 /* ============================================================
+   MERGE (used by backup import and sync)
+   Union of decks, highest level, most goals. Never loses data.
+   ============================================================ */
+function mergeState(d, withSettings) {
+  if (!d || typeof d !== "object") return;
+  const byNo = {};
+  for (const c of S.deck) byNo[c.no.trim().toLowerCase()] = c;
+  for (const c of (d.deck || [])) {
+    if (!c || !c.no || !c.en) continue;
+    const k = c.no.trim().toLowerCase();
+    const existing = byNo[k];
+    // keep whichever copy was reviewed most recently (larger due date)
+    if (!existing || (c.due || 0) >= (existing.due || 0)) byNo[k] = c;
+  }
+  S.deck = Object.values(byNo);
+  for (const c of S.deck) { if (c.lapses == null) c.lapses = 0; }
+  if ((d.level || 1) > S.level || ((d.level || 1) === S.level && (d.xp || 0) > S.xp)) {
+    S.level = d.level || 1; S.xp = d.xp || 0;
+    if (d.gate) S.gate = d.gate;
+  }
+  if (d.stats) {
+    S.stats.exercises = Math.max(S.stats.exercises, d.stats.exercises || 0);
+    Object.assign(S.stats.days, d.stats.days || {});
+  }
+  if (d.grammarLog) {
+    for (const [k, v] of Object.entries(d.grammarLog)) {
+      S.grammarLog[k] = Math.max(S.grammarLog[k] || 0, v);
+    }
+  }
+  if (d.goals) {
+    for (const [k, v] of Object.entries(d.goals)) {
+      if ((S.goals[k] || 0) < v) S.goals[k] = v;
+    }
+  }
+  if (d.profile && d.profile.placedAt && (!S.profile.placedAt || d.profile.placedAt > S.profile.placedAt)) {
+    S.profile = Object.assign({}, S.profile, d.profile);
+  }
+  if (withSettings && d.settings) {
+    S.settings.topics = d.settings.topics || S.settings.topics;
+    S.settings.difficulty = d.settings.difficulty || S.settings.difficulty;
+    S.settings.cardStyle = d.settings.cardStyle || S.settings.cardStyle;
+  }
+  save();
+}
+
+/* ============================================================
+   SYNC via private GitHub Gist
+   ============================================================ */
+const GH_TOKEN_KEY = "norgareth_ghtoken";
+const GIST_ID_KEY = "norgareth_gistid";
+const GIST_DESC = "NorGareth sync data (do not edit)";
+function ghToken() { return localStorage.getItem(GH_TOKEN_KEY) || ""; }
+async function ghApi(path, method, body) {
+  let res;
+  try {
+    res = await fetch("https://api.github.com" + path, {
+      method: method || "GET",
+      headers: { "Authorization": "Bearer " + ghToken(), "Accept": "application/vnd.github+json" },
+      body: body ? JSON.stringify(body) : undefined
+    });
+  } catch (e) { throw new Error("network problem"); }
+  if (!res.ok) throw new Error(res.status === 401 ? "token rejected" : "GitHub error " + res.status);
+  return res.json();
+}
+async function findOrCreateGist() {
+  let id = localStorage.getItem(GIST_ID_KEY);
+  if (id) return id;
+  const gists = await ghApi("/gists?per_page=100");
+  const hit = gists.find(g => g.description === GIST_DESC);
+  if (hit) { localStorage.setItem(GIST_ID_KEY, hit.id); return hit.id; }
+  const created = await ghApi("/gists", "POST", {
+    description: GIST_DESC, public: false,
+    files: { "norgareth.json": { content: JSON.stringify(S) } }
+  });
+  localStorage.setItem(GIST_ID_KEY, created.id);
+  return created.id;
+}
+let syncBusyFlag = false;
+async function syncNow(manual) {
+  if (!ghToken()) { if (manual) toast("Paste a GitHub token and tap Connect first."); return; }
+  if (syncBusyFlag) return;
+  syncBusyFlag = true;
+  const st = $("syncStatus");
+  st.textContent = "Syncing...";
+  try {
+    const id = await findOrCreateGist();
+    const gist = await ghApi("/gists/" + id);
+    const file = gist.files && gist.files["norgareth.json"];
+    if (file) {
+      let content = file.content;
+      if (file.truncated && file.raw_url) {
+        const r = await fetch(file.raw_url);
+        content = await r.text();
+      }
+      try { mergeState(JSON.parse(content), false); } catch (e) { /* remote unreadable; will be overwritten */ }
+    }
+    await ghApi("/gists/" + id, "PATCH", { files: { "norgareth.json": { content: JSON.stringify(S) } } });
+    syncDirty = false;
+    st.textContent = "Synced at " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    renderProgress(); renderVocabStats(); renderStats();
+    if (manual) toast("Synced");
+  } catch (e) {
+    st.textContent = "Sync failed: " + e.message + ". Your local progress is safe.";
+    if (manual) toast("Sync failed: " + e.message);
+  }
+  syncBusyFlag = false;
+}
+$("syncConnect").addEventListener("click", async () => {
+  const tok = $("sGhToken").value.trim();
+  if (!tok) { toast("Paste a GitHub token first."); return; }
+  localStorage.setItem(GH_TOKEN_KEY, tok);
+  localStorage.removeItem(GIST_ID_KEY);
+  const btn = $("syncConnect");
+  busy(btn, true, "Connecting...");
+  await syncNow(true);
+  busy(btn, false);
+});
+$("syncNowBtn").addEventListener("click", () => syncNow(true));
+setInterval(() => { if (syncDirty && ghToken()) syncNow(false); }, 60000);
+
+/* ============================================================
    SETTINGS
    ============================================================ */
 function renderStats() {
@@ -1941,6 +2074,8 @@ function loadSettingsUI() {
   $("sDiff").value = S.settings.difficulty;
   $("sCardStyle").value = S.settings.cardStyle;
   $("sTopics").value = S.settings.topics;
+  $("sGhToken").value = ghToken();
+  if (ghToken()) $("syncStatus").textContent = "Connected. Syncs automatically.";
   pickVoices();
 }
 $("sSave").addEventListener("click", () => {
@@ -1975,38 +2110,7 @@ $("sImportFile").addEventListener("change", e => {
     try {
       const d = JSON.parse(r.result);
       if (!d || !Array.isArray(d.deck)) throw new Error("That does not look like a NorGareth backup.");
-      const byNo = {};
-      for (const c of S.deck) byNo[c.no.trim().toLowerCase()] = c;
-      for (const c of d.deck) if (c && c.no && c.en) byNo[c.no.trim().toLowerCase()] = c;
-      S.deck = Object.values(byNo);
-      for (const c of S.deck) { if (c.lapses == null) c.lapses = 0; }
-      if ((d.level || 1) > S.level || ((d.level || 1) === S.level && (d.xp || 0) > S.xp)) {
-        S.level = d.level || 1; S.xp = d.xp || 0;
-        S.gate = d.gate || S.gate;
-      }
-      if (d.stats) {
-        S.stats.exercises = Math.max(S.stats.exercises, d.stats.exercises || 0);
-        Object.assign(S.stats.days, d.stats.days || {});
-      }
-      if (d.grammarLog) {
-        for (const [k, v] of Object.entries(d.grammarLog)) {
-          S.grammarLog[k] = Math.max(S.grammarLog[k] || 0, v);
-        }
-      }
-      if (d.goals) {
-        for (const [k, v] of Object.entries(d.goals)) {
-          if ((S.goals[k] || 0) < v) S.goals[k] = v;
-        }
-      }
-      if (d.profile && d.profile.placedAt && (!S.profile.placedAt || d.profile.placedAt > S.profile.placedAt)) {
-        S.profile = Object.assign({}, S.profile, d.profile);
-      }
-      if (d.settings) {
-        S.settings.topics = d.settings.topics || S.settings.topics;
-        S.settings.difficulty = d.settings.difficulty || S.settings.difficulty;
-        S.settings.cardStyle = d.settings.cardStyle || S.settings.cardStyle;
-      }
-      save();
+      mergeState(d, true);
       renderProgress(); renderStats(); renderVocabStats(); loadSettingsUI();
       toast("Backup imported and merged");
     } catch (err) { toast("Import failed: " + err.message); }
@@ -2019,6 +2123,8 @@ $("sReset").addEventListener("click", () => {
   if (!confirm("Really erase everything, including your deck and level?")) return;
   localStorage.removeItem(STORE_KEY);
   localStorage.removeItem(KEY_KEY);
+  localStorage.removeItem(GH_TOKEN_KEY);
+  localStorage.removeItem(GIST_ID_KEY);
   location.reload();
 });
 
@@ -2027,6 +2133,7 @@ load();
 renderProgress();
 renderVocabStats();
 loadSettingsUI();
+if (ghToken()) syncNow(false);
 if (!apiKey()) {
   setTimeout(() => {
     toast("Welcome! Tap the gear icon and add your Anthropic API key to get started.", 5000);

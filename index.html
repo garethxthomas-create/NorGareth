@@ -205,6 +205,18 @@ button.ghost .spin,button.subtle .spin,button.chip .spin{border-color:var(--acce
 .bigstat div{flex:1; background:var(--bg); border-radius:10px; padding:10px; text-align:center;}
 .bigstat .n{font-size:1.3rem; font-weight:700; color:var(--accent);}
 .bigstat .l{font-size:.72rem; color:var(--muted);}
+/* syllabus */
+.profrow{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:.92rem;}
+.profrow:last-child{border-bottom:none;}
+.profrow .p-lvl{font-weight:700; color:var(--accent); background:var(--accent-soft); padding:2px 10px; border-radius:999px; font-size:.8rem;}
+.profrow .p-cov{font-size:.78rem; color:var(--muted);}
+details.syl{border:1px solid var(--border); border-radius:10px; margin-top:8px; padding:0 12px;}
+details.syl summary{cursor:pointer; font-weight:600; font-size:.9rem; padding:10px 0; color:var(--ink);}
+.goalrow{display:flex; gap:8px; padding:7px 0; border-top:1px solid var(--border); font-size:.85rem; color:var(--muted); align-items:flex-start;}
+.goalrow .gmark{flex-shrink:0; width:18px; text-align:center;}
+.goalrow.done{color:var(--ink);}
+.goalrow.done .gmark{color:var(--good);}
+.goalrow.part .gmark{color:var(--warn);}
 </style>
 </head>
 <body>
@@ -369,6 +381,7 @@ button.ghost .spin,button.subtle .spin,button.chip .spin{border-color:var(--acce
       <button class="ghost" id="tSlow">Slow</button>
     </div>
     <div class="opts" id="tOpts" style="display:none; margin-top:12px"></div>
+    <div id="tReadArea" style="display:none"></div>
     <textarea id="tInput" placeholder="Ditt svar..." autocapitalize="sentences" autocomplete="off"></textarea>
     <div class="btnrow">
       <button id="tCheck">Check</button>
@@ -411,6 +424,13 @@ button.ghost .spin,button.subtle .spin,button.chip .spin{border-color:var(--acce
       <div><div class="n" id="stEx">0</div><div class="l">exercises done</div></div>
       <div><div class="n" id="stDays">0</div><div class="l">days practiced</div></div>
     </div>
+    <div id="profileRows" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <h2>Official syllabus</h2>
+    <p class="hint" style="margin-top:0">Goals adapted from Norway's official curriculum for adult learners (HK-dir laereplan, levels A1 to B1). The placement test finds your starting point per skill; checkpoint tests then verify goals one by one. Oral skills are practiced in Chat but cannot be formally verified by typing.</p>
+    <div class="btnrow"><button id="plStart">Take placement test</button></div>
+    <div id="sylList"></div>
   </div>
   <div class="card">
     <h2>Backup</h2>
@@ -466,7 +486,9 @@ let S = {
   recentEn: [],        // last generated English sentences, to avoid repeats
   recentThemes: [],    // last used themes, to force variety
   grammarLog: {},      // {tag: count}
-  gate: { pending: false, level: 0 }
+  gate: { pending: false, level: 0 },
+  goals: {},           // {goalId: 1 partial | 2 verified}
+  profile: { listen: "", read: "", write: "", placedAt: null }
 };
 
 function load() {
@@ -479,6 +501,8 @@ function load() {
       S.stats = Object.assign({ exercises:0, days:{} }, d.stats || {});
       S.grammarLog = d.grammarLog || {};
       S.gate = d.gate || { pending: false, level: 0 };
+      S.goals = d.goals || {};
+      S.profile = Object.assign({ listen: "", read: "", write: "", placedAt: null }, d.profile || {});
       if (!Array.isArray(S.deck)) S.deck = [];
       if (!Array.isArray(S.recentEn)) S.recentEn = [];
       if (!Array.isArray(S.recentThemes)) S.recentThemes = [];
@@ -655,6 +679,105 @@ function pickTheme() {
 function noteTheme(t) {
   S.recentThemes.push(t);
   if (S.recentThemes.length > 8) S.recentThemes.shift();
+  save();
+}
+
+/* ---------- official syllabus (condensed from HK-dir laereplan A1-B1) ---------- */
+const SYLLABUS = [
+  // A1 listen
+  { id:"a1l1", lv:"A1", sk:"listen", t:"Recognize familiar words, phrases, and very simple sentences in slow, clear speech" },
+  { id:"a1l2", lv:"A1", sk:"listen", t:"Catch the main content of very simply presented information in a familiar context" },
+  { id:"a1l3", lv:"A1", sk:"listen", t:"Understand very simple messages, instructions, and directions addressed to you" },
+  { id:"a1l4", lv:"A1", sk:"listen", t:"Understand numbers, quantities, prices, and times" },
+  { id:"a1l5", lv:"A1", sk:"listen", t:"Catch very simple information on familiar topics from audio or video" },
+  // A1 read
+  { id:"a1r1", lv:"A1", sk:"read", t:"Recognize familiar names, words, and very simple phrases on signs, notices, and tables" },
+  { id:"a1r2", lv:"A1", sk:"read", t:"Read very simple sentences in short messages" },
+  { id:"a1r3", lv:"A1", sk:"read", t:"Understand short, very simply worded instructions" },
+  { id:"a1r4", lv:"A1", sk:"read", t:"Get the gist of very simple informational texts" },
+  { id:"a1r5", lv:"A1", sk:"read", t:"Understand very simple adapted texts, factual or fiction" },
+  // A1 write
+  { id:"a1w1", lv:"A1", sk:"write", t:"Write very simply about yourself: where you live, what you do, what you like" },
+  { id:"a1w2", lv:"A1", sk:"write", t:"Describe people, places, and objects very simply" },
+  { id:"a1w3", lv:"A1", sk:"write", t:"Write and answer very simple messages about concrete needs" },
+  { id:"a1w4", lv:"A1", sk:"write", t:"Write very simple posts and comments in digital communication" },
+  { id:"a1w5", lv:"A1", sk:"write", t:"Fill in basic personal details in very simple forms" },
+  { id:"a1w6", lv:"A1", sk:"write", t:"Use numbers for dates, times, quantities, and prices in writing" },
+  // A2 listen
+  { id:"a2l1", lv:"A2", sk:"listen", t:"Catch the topic of short, simple conversations" },
+  { id:"a2l2", lv:"A2", sk:"listen", t:"Understand simple information on a familiar topic, e.g. a presentation" },
+  { id:"a2l3", lv:"A2", sk:"listen", t:"Understand the main content and some details of short messages, instructions, and directions" },
+  { id:"a2l4", lv:"A2", sk:"listen", t:"Catch key information from short audio or video clips, e.g. news, when spoken slowly and clearly" },
+  { id:"a2l5", lv:"A2", sk:"listen", t:"Understand some common pronunciation and dialect variants from daily life" },
+  // A2 read
+  { id:"a2r1", lv:"A2", sk:"read", t:"Find and understand specific, predictable information in simple everyday texts: websites, brochures, ads, signs" },
+  { id:"a2r2", lv:"A2", sk:"read", t:"Read simple messages, letters, emails, and social media posts" },
+  { id:"a2r3", lv:"A2", sk:"read", t:"Understand short, simply worded instructions" },
+  { id:"a2r4", lv:"A2", sk:"read", t:"Understand the main points of short, simple news items and adapted factual texts" },
+  { id:"a2r5", lv:"A2", sk:"read", t:"Understand the main features of texts with very simple charts or tables" },
+  { id:"a2r6", lv:"A2", sk:"read", t:"Read very simple fiction" },
+  // A2 write
+  { id:"a2w1", lv:"A2", sk:"write", t:"Write simply about your background, experiences, interests, and future plans" },
+  { id:"a2w2", lv:"A2", sk:"write", t:"Note a few keywords from a meeting or simple presentation" },
+  { id:"a2w3", lv:"A2", sk:"write", t:"Describe people, places, and activities simply" },
+  { id:"a2w4", lv:"A2", sk:"write", t:"Write and answer messages, invitations, suggestions, and congratulations" },
+  { id:"a2w5", lv:"A2", sk:"write", t:"Write short, simple emails and personal letters" },
+  { id:"a2w6", lv:"A2", sk:"write", t:"Fill in common everyday forms: shopping, banking, bookings" },
+  { id:"a2w7", lv:"A2", sk:"write", t:"Present your competence in a simple CV" },
+  { id:"a2w8", lv:"A2", sk:"write", t:"Express your opinions simply on topics of personal interest" },
+  // B1 listen
+  { id:"b1l1", lv:"B1", sk:"listen", t:"Understand main points and some details in conversations and discussions on familiar topics" },
+  { id:"b1l2", lv:"B1", sk:"listen", t:"Follow clear, structured talks, presentations, and stories on familiar topics" },
+  { id:"b1l3", lv:"B1", sk:"listen", t:"Understand specific details in messages, instructions, and directions" },
+  { id:"b1l4", lv:"B1", sk:"listen", t:"Understand main points and some details in news, podcasts, and films" },
+  { id:"b1l5", lv:"B1", sk:"listen", t:"Understand a fair range of pronunciation and dialect variation from daily life" },
+  // B1 read
+  { id:"b1r1", lv:"B1", sk:"read", t:"Find and understand relevant information in everyday informational texts: official letters, documents, websites" },
+  { id:"b1r2", lv:"B1", sk:"read", t:"Understand everyday texts: letters, emails, and social media posts" },
+  { id:"b1r3", lv:"B1", sk:"read", t:"Understand clear instructions" },
+  { id:"b1r4", lv:"B1", sk:"read", t:"Understand the main points of simple news articles and texts in your own field, and judge their relevance" },
+  { id:"b1r5", lv:"B1", sk:"read", t:"Understand the main features of texts with simple charts or diagrams" },
+  { id:"b1r6", lv:"B1", sk:"read", t:"Read simple fiction" },
+  // B1 write
+  { id:"b1w1", lv:"B1", sk:"write", t:"Write simple connected texts about experiences, interests, ambitions, and plans, with some detail" },
+  { id:"b1w2", lv:"B1", sk:"write", t:"Note the main points from a meeting or presentation on a familiar topic" },
+  { id:"b1w3", lv:"B1", sk:"write", t:"Write short reports related to your own work or study situation" },
+  { id:"b1w4", lv:"B1", sk:"write", t:"Describe people, places, events, and experiences in detail" },
+  { id:"b1w5", lv:"B1", sk:"write", t:"Write personal posts and take part in discussions on familiar topics online" },
+  { id:"b1w6", lv:"B1", sk:"write", t:"Write simple formal emails and letters, for example a job application" },
+  { id:"b1w7", lv:"B1", sk:"write", t:"Fill in information in a variety of everyday digital forms" },
+  { id:"b1w8", lv:"B1", sk:"write", t:"Express and briefly justify opinions in simple connected text" },
+  { id:"b1w9", lv:"B1", sk:"write", t:"Retell the content of simple fiction" },
+  { id:"b1w10", lv:"B1", sk:"write", t:"Summarize and relay relevant information from clearly written texts on familiar topics" }
+];
+const SKILLS = ["listen", "read", "write"];
+const SKILL_NAMES = { listen: "Listening", read: "Reading", write: "Writing" };
+const LV_ORDER = ["A1", "A2", "B1"];
+
+function goalState(id) { return S.goals[id] || 0; }
+function setGoal(id, v) {
+  if (v > goalState(id)) { S.goals[id] = v; save(); }
+}
+function goalsFor(lv, sk) { return SYLLABUS.filter(g => g.lv === lv && g.sk === sk); }
+function coverage(lv, sk) {
+  const gs = sk ? goalsFor(lv, sk) : SYLLABUS.filter(g => g.lv === lv);
+  const done = gs.filter(g => goalState(g.id) === 2).length;
+  return { done, total: gs.length };
+}
+function nextTargetGoal(sk) {
+  for (const lv of LV_ORDER) {
+    const g = goalsFor(lv, sk).find(x => goalState(x.id) < 2);
+    if (g) return g;
+  }
+  return null;
+}
+function applyPlacement(sk, lvl) {
+  // Mark levels below the placed level as verified, the placed level as partial.
+  const idx = LV_ORDER.indexOf(lvl);
+  if (idx === -1) return;
+  for (let i = 0; i < idx; i++) for (const g of goalsFor(LV_ORDER[i], sk)) setGoal(g.id, 2);
+  for (const g of goalsFor(lvl, sk)) setGoal(g.id, 1);
+  S.profile[sk] = lvl;
   save();
 }
 
@@ -1407,149 +1530,349 @@ $("chReset").addEventListener("click", () => {
 });
 
 /* ============================================================
-   CHECKPOINT TEST
-   5 items, average score >= 70 to pass the gate.
+   ASSESSMENT ENGINE: checkpoint tests + placement test
+   Items are targeted at official syllabus goals.
    ============================================================ */
-let tItems = [], tIdx = 0, tScores = [], tCurrent = null;
+let T = { mode: null, items: [], idx: 0, scores: [], cur: null };
+let pl = null; // placement state machine
 
-function startTest() {
-  if (!S.gate.pending) {
-    $("tPrompt").textContent = "No checkpoint is due right now. Keep practicing!";
-    $("tInput").style.display = "none";
-    $("tCheck").style.display = "none";
-    $("tProg").textContent = "";
-    $("tResult").classList.remove("show");
-    $("tSummary").style.display = "none";
-    $("tAudioRow").style.display = "none";
-    $("tOpts").style.display = "none";
-    return;
-  }
-  tItems = ["en-no", "en-no", "no-en", canSpeak() && noVoice ? "dictation" : "en-no",
-    S.deck.length >= 4 ? "vocab" : "en-no"];
-  tIdx = 0; tScores = [];
-  $("tHead").textContent = "Checkpoint test: level " + S.gate.level;
-  $("tSummary").style.display = "none";
-  nextTestItem();
+function lvListenSpec(lv) {
+  if (lv === "A1") return "One very simple sentence of 5 to 7 common words, spoken everyday Norwegian.";
+  if (lv === "A2") return "One clear sentence of 9 to 12 words.";
+  return "Two connected sentences totaling about 18 words.";
 }
-async function nextTestItem() {
-  const kind = tItems[tIdx];
-  $("tProg").textContent = "Question " + (tIdx + 1) + " of " + tItems.length;
+function lvReadWords(lv) { return lv === "A1" ? 35 : lv === "A2" ? 60 : 100; }
+const WRITE_PROMPTS = {
+  A1: ["Introduce yourself in Norwegian: your name, where you live, and one thing you like. 2 to 3 sentences.",
+       "Write a very short message to a friend saying you are coming at 6 o'clock and asking what you should bring. 2 sentences."],
+  A2: ["Describe what you did last weekend. 3 to 4 sentences in Norwegian.",
+       "Write a short message inviting a colleague to lunch on Friday, and suggest a time and place. 3 sentences.",
+       "Describe your job or daily routine simply. 3 to 4 sentences."],
+  B1: ["Do you think it is better to work from home or at the office? Give your opinion with two reasons. 4 to 6 sentences in Norwegian.",
+       "Describe a trip or experience you remember well, with some detail about what happened and how it felt. 4 to 6 sentences.",
+       "Write a short formal email asking for information about a Norwegian course: when it starts, the price, and how to sign up. 4 to 5 sentences."]
+};
+
+async function genListenItem(lv, goalText) {
+  const sys = "You write Norwegian Bokmål for a listening dictation test item at CEFR level " + lv + ". " + promptContext() +
+    " " + lvListenSpec(lv) +
+    (goalText ? " The item should exercise this curriculum goal: " + goalText + "." : "") +
+    ' Respond with only JSON: {"norwegian":"..."}';
+  return callJSON(sys, [{ role: "user", content: "One dictation item." }], 300);
+}
+async function genReadItem(lv, goalText) {
+  const sys = "You write a Norwegian Bokmål reading test item at CEFR level " + lv + ". " + promptContext() +
+    " A text of about " + lvReadWords(lv) + " words" +
+    (goalText ? ", in a format that exercises this curriculum goal: " + goalText : ", on an everyday topic") +
+    ". Then 2 multiple-choice comprehension questions IN NORWEGIAN, each with exactly 3 options and one correct answer." +
+    ' Respond with only JSON: {"passage":"...","questions":[{"q":"...","options":["...","...","..."],"answer":0,"why":"one short English sentence"}]}';
+  return callJSON(sys, [{ role: "user", content: "One reading item." }], 1200);
+}
+async function genWriteItem(lv, goalText) {
+  if (!goalText) {
+    const arr = WRITE_PROMPTS[lv] || WRITE_PROMPTS.A2;
+    return { task: arr[Math.floor(Math.random() * arr.length)] };
+  }
+  const sys = "You create one short writing task (written in English) for a Norwegian test at CEFR level " + lv + ". " + promptContext() +
+    " The task must test this curriculum goal: " + goalText + ". Tell the learner what to write in Norwegian and roughly how many sentences (3 to 6)." +
+    ' Respond with only JSON: {"task":"..."}';
+  return callJSON(sys, [{ role: "user", content: "One writing task." }], 300);
+}
+async function markWriting(task, answer, lv) {
+  const sys = "You are a strict but fair Norwegian Bokmål examiner marking a short writing task against CEFR level " + lv + ". " + promptContext() +
+    ' Respond with only JSON: {"score":0-100,"cefr":"your estimate of the CEFR level of this writing: A1, A2, or B1",' +
+    '"comment":"one short honest sentence",' +
+    '"errors":[{"issue":"3-6 word label","explanation":"clear English explanation","tag":"one of: ' + TAG_LIST + '"}],' +
+    '"native":"a natural model answer in 2-3 sentences"} ' +
+    "Score 70+ means the writing clearly meets the " + lv + " requirement of the task.";
+  return callJSON(sys, [{ role: "user", content: "Task: " + task + "\nLearner's Norwegian: " + answer }], 1200);
+}
+async function markDictation(actual, typed) {
+  const sys = "You mark a Norwegian dictation, strictly but fairly. " + promptContext() +
+    ' Respond with only JSON: {"score":0-100,"comment":"one short sentence","errors":[{"issue":"...","explanation":"..."}]}';
+  const j = await callJSON(sys, [{ role: "user", content: "Actual: " + actual + "\nLearner typed: " + typed }], 800);
+  j.native = "The text was: " + actual;
+  return j;
+}
+
+function resetTestUI() {
   $("tResult").classList.remove("show");
+  $("tSummary").style.display = "none";
   $("tInput").value = "";
   $("tInput").style.display = "";
   $("tCheck").style.display = "";
   $("tNext").style.display = "none";
   $("tAudioRow").style.display = "none";
   $("tOpts").style.display = "none";
+  $("tReadArea").style.display = "none";
+  $("tReadArea").innerHTML = "";
+}
+
+/* ----- checkpoint ----- */
+function startTest() {
+  if (!S.gate.pending) {
+    resetTestUI();
+    $("tHead").textContent = "Checkpoint test";
+    $("tPrompt").textContent = "No checkpoint is due right now. Keep practicing!";
+    $("tInput").style.display = "none";
+    $("tCheck").style.display = "none";
+    $("tProg").textContent = "";
+    return;
+  }
+  T = { mode: "checkpoint", items: [], idx: 0, scores: [], cur: null };
+  const canListen = canSpeak() && noVoice;
+  T.items = [
+    { kind: "en-no" },
+    canListen ? { kind: "listen", goal: nextTargetGoal("listen") } : { kind: "en-no" },
+    { kind: "read", goal: nextTargetGoal("read") },
+    { kind: "write", goal: nextTargetGoal("write") },
+    S.deck.length >= 4 ? { kind: "vocab" } : { kind: "en-no" }
+  ];
+  $("tHead").textContent = "Checkpoint test: level " + S.gate.level;
+  renderTestItem();
+}
+
+/* ----- placement ----- */
+function startPlacement() {
+  const skList = SKILLS.filter(sk => sk !== "listen" || (canSpeak() && noVoice));
+  pl = { skList, si: 0, stage: "A2", second: false, levels: {} };
+  T = { mode: "placement", items: [], idx: 0, scores: [], cur: null };
+  $("tHead").textContent = "Placement test";
+  buildPlacementItem();
+}
+function buildPlacementItem() {
+  const sk = pl.skList[pl.si];
+  T.items.push({ kind: sk, lv: pl.stage, placement: true });
+  renderTestItem();
+}
+function plRecord(score) {
+  const sk = pl.skList[pl.si];
+  if (!pl.second) {
+    pl.second = true;
+    pl.stage = score >= 70 ? "B1" : "A1";
+  } else {
+    const lvl = pl.stage === "B1" ? (score >= 70 ? "B1" : "A2") : (score >= 70 ? "A1" : "A1");
+    pl.levels[sk] = lvl;
+    pl.si++; pl.second = false; pl.stage = "A2";
+  }
+}
+function plHasMore() { return pl.si < pl.skList.length; }
+
+/* ----- shared rendering ----- */
+async function renderTestItem() {
+  const it = T.items[T.idx];
+  T.cur = it;
+  resetTestUI();
+  const total = T.mode === "checkpoint" ? T.items.length : pl.skList.length * 2;
+  const num = T.mode === "checkpoint" ? (T.idx + 1) : (T.idx + 1);
+  $("tProg").textContent = "Question " + num + " of " + total +
+    (it.goal ? "  |  Goal: " + it.goal.t : "") +
+    (it.placement ? "  |  " + SKILL_NAMES[it.kind] + ", level " + it.lv : "");
   $("tPrompt").textContent = "Preparing...";
+  const lv = it.lv || (it.goal ? it.goal.lv : "B1");
   try {
-    if (kind === "en-no") {
+    if (it.kind === "en-no") {
       const sys = "You write one English sentence for a Norwegian checkpoint test. " + promptContext() +
         ' 8 to 16 words, testing level-appropriate grammar. Respond with only JSON: {"english":"..."}';
       const j = await callJSON(sys, [{ role: "user", content: "One test sentence." }], 300);
-      tCurrent = { kind, english: j.english };
+      it.english = j.english;
       $("tPrompt").textContent = "Translate to Norwegian: " + j.english;
-    } else if (kind === "no-en") {
-      const sys = "You write one Norwegian Bokmål sentence for a comprehension test. " + promptContext() +
-        ' 8 to 14 words. Respond with only JSON: {"norwegian":"..."}';
-      const j = await callJSON(sys, [{ role: "user", content: "One test sentence." }], 300);
-      tCurrent = { kind, norwegian: j.norwegian };
-      $("tPrompt").textContent = "Translate to English: " + j.norwegian;
-    } else if (kind === "dictation") {
-      const sys = "You write Norwegian Bokmål for a dictation test. " + promptContext() +
-        " " + listenSpec() + ' Respond with only JSON: {"norwegian":"..."}';
-      const j = await callJSON(sys, [{ role: "user", content: "One dictation item." }], 300);
-      tCurrent = { kind, norwegian: j.norwegian };
+    } else if (it.kind === "listen") {
+      const j = await genListenItem(lv, it.goal && it.goal.t);
+      it.norwegian = j.norwegian;
       $("tPrompt").textContent = "Listen and type what you hear:";
       $("tAudioRow").style.display = "";
-    } else if (kind === "vocab") {
-      const weak = weakCards(1)[0];
-      const others = S.deck.filter(c => c.id !== weak.id).sort(() => Math.random() - 0.5).slice(0, 3);
-      const options = [weak, ...others].sort(() => Math.random() - 0.5);
-      tCurrent = { kind, card: weak };
-      $("tPrompt").textContent = 'What does "' + weak.no + '" mean?';
+    } else if (it.kind === "read") {
+      const j = await genReadItem(lv, it.goal && it.goal.t);
+      it.read = j;
+      it.readScore = 0; it.readAnswered = 0;
+      $("tPrompt").textContent = "Read the text and answer the questions:";
       $("tInput").style.display = "none";
       $("tCheck").style.display = "none";
-      const box = $("tOpts");
-      box.innerHTML = "";
-      box.style.display = "";
-      options.forEach(c => {
-        const b = document.createElement("button");
-        b.textContent = c.en;
-        b.addEventListener("click", () => {
-          box.querySelectorAll("button").forEach(x => x.disabled = true);
-          const right = c.id === weak.id;
-          b.classList.add(right ? "correct" : "incorrect");
-          if (!right) box.querySelectorAll("button").forEach(x => { if (x.textContent === weak.en) x.classList.add("correct"); });
-          tScores.push(right ? 100 : 0);
-          gradeCard(weak, right ? 4 : 0);
-          $("tNext").style.display = "";
-          $("tNext").textContent = tIdx + 1 < tItems.length ? "Next" : "Finish";
-        });
-        box.appendChild(b);
-      });
+      renderTestRead(it);
+    } else if (it.kind === "write") {
+      const j = await genWriteItem(lv, it.goal && it.goal.t);
+      it.task = j.task;
+      $("tPrompt").textContent = j.task;
+    } else if (it.kind === "vocab") {
+      renderVocabItem(it);
     }
   } catch (e) {
     toast(e.message);
-    $("tPrompt").textContent = "Could not load this question. Tap Check to retry.";
+    $("tPrompt").textContent = "Could not load this question. Tap Next to retry.";
+    $("tCheck").style.display = "none";
+    $("tNext").style.display = "";
+    $("tNext").textContent = "Retry";
+    it.retry = true;
   }
 }
-$("tPlay").addEventListener("click", () => tCurrent && tCurrent.norwegian && speak(tCurrent.norwegian, 1));
-$("tSlow").addEventListener("click", () => tCurrent && tCurrent.norwegian && speak(tCurrent.norwegian, 0.72));
+function renderTestRead(it) {
+  const area = $("tReadArea");
+  area.style.display = "";
+  const p = document.createElement("div");
+  p.className = "passage";
+  p.textContent = it.read.passage;
+  area.appendChild(p);
+  it.read.questions.slice(0, 2).forEach(q => {
+    const block = document.createElement("div");
+    block.className = "qblock";
+    block.innerHTML = '<div class="qtext">' + esc(q.q) + "</div>";
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    const why = document.createElement("div");
+    why.className = "why";
+    why.textContent = q.why || "";
+    q.options.forEach((opt, oi) => {
+      const b = document.createElement("button");
+      b.textContent = opt;
+      b.addEventListener("click", () => {
+        if (opts.dataset.done) return;
+        opts.dataset.done = "1";
+        opts.querySelectorAll("button").forEach((x, xi) => {
+          x.disabled = true;
+          if (xi === q.answer) x.classList.add("correct");
+          else if (xi === oi) x.classList.add("incorrect");
+        });
+        why.classList.add("show");
+        it.readAnswered++;
+        if (oi === q.answer) it.readScore += 50;
+        if (it.readAnswered === 2) itemDone(it.readScore);
+      });
+      opts.appendChild(b);
+    });
+    block.appendChild(opts);
+    block.appendChild(why);
+    area.appendChild(block);
+  });
+}
+function renderVocabItem(it) {
+  const weak = weakCards(1)[0];
+  const others = S.deck.filter(c => c.id !== weak.id).sort(() => Math.random() - 0.5).slice(0, 3);
+  const options = [weak, ...others].sort(() => Math.random() - 0.5);
+  $("tPrompt").textContent = 'What does "' + weak.no + '" mean?';
+  $("tInput").style.display = "none";
+  $("tCheck").style.display = "none";
+  const box = $("tOpts");
+  box.innerHTML = "";
+  box.style.display = "";
+  options.forEach(c => {
+    const b = document.createElement("button");
+    b.textContent = c.en;
+    b.addEventListener("click", () => {
+      box.querySelectorAll("button").forEach(x => x.disabled = true);
+      const right = c.id === weak.id;
+      b.classList.add(right ? "correct" : "incorrect");
+      if (!right) box.querySelectorAll("button").forEach(x => { if (x.textContent === weak.en) x.classList.add("correct"); });
+      gradeCard(weak, right ? 4 : 0);
+      itemDone(right ? 100 : 0);
+    });
+    box.appendChild(b);
+  });
+}
+function itemDone(score) {
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  T.scores.push(score);
+  const it = T.cur;
+  if (T.mode === "checkpoint" && it.goal) {
+    if (score >= 70) setGoal(it.goal.id, 2);
+    else if (score >= 40) setGoal(it.goal.id, 1);
+  }
+  if (T.mode === "placement") plRecord(score);
+  $("tCheck").style.display = "none";
+  $("tNext").style.display = "";
+  const more = T.mode === "checkpoint" ? (T.idx + 1 < T.items.length) : plHasMore();
+  $("tNext").textContent = more ? "Next" : "Finish";
+}
+$("tPlay").addEventListener("click", () => T.cur && T.cur.norwegian && speak(T.cur.norwegian, 1));
+$("tSlow").addEventListener("click", () => T.cur && T.cur.norwegian && speak(T.cur.norwegian, 0.72));
 $("tCheck").addEventListener("click", async () => {
-  if (!tCurrent) { nextTestItem(); return; }
+  const it = T.cur;
+  if (!it) return;
   const ans = $("tInput").value.trim();
-  if (!ans && tCurrent.kind !== "vocab") { toast("Answer first."); return; }
+  if (!ans) { toast("Answer first."); return; }
   const btn = $("tCheck");
   busy(btn, true, "Marking...");
   try {
     let j;
-    if (tCurrent.kind === "en-no") {
-      j = await markTranslation(tCurrent.english, ans, "This is a checkpoint test; mark strictly.");
-    } else if (tCurrent.kind === "no-en") {
-      const sys = "You mark an English translation of a Norwegian sentence, strictly but fairly. " + promptContext() +
-        ' Respond with only JSON: {"score":0-100,"comment":"one short sentence","errors":[{"issue":"...","explanation":"..."}],"native":"a natural English translation"}';
-      j = await callJSON(sys, [{ role: "user", content: "Norwegian: " + tCurrent.norwegian + "\nLearner's English: " + ans }], 800);
-    } else if (tCurrent.kind === "dictation") {
-      const sys = "You mark a Norwegian dictation, strictly but fairly. " + promptContext() +
-        ' Respond with only JSON: {"score":0-100,"comment":"one short sentence","errors":[{"issue":"...","explanation":"..."}],"native":"' + "" + '"}';
-      j = await callJSON(sys, [{ role: "user", content: "Actual: " + tCurrent.norwegian + "\nLearner typed: " + ans }], 800);
-      j.native = "The text was: " + tCurrent.norwegian;
+    const lv = it.lv || (it.goal ? it.goal.lv : "B1");
+    if (it.kind === "en-no") {
+      j = await markTranslation(it.english, ans, "This is a test; mark strictly.");
+    } else if (it.kind === "listen") {
+      j = await markDictation(it.norwegian, ans);
+    } else if (it.kind === "write") {
+      j = await markWriting(it.task, ans, lv);
     }
-    tScores.push(Math.max(0, Math.min(100, j.score || 0)));
     renderMarking($("tResult"), j);
-    $("tCheck").style.display = "none";
-    $("tNext").style.display = "";
-    $("tNext").textContent = tIdx + 1 < tItems.length ? "Next" : "Finish";
+    logErrors(j);
+    itemDone(j.score || 0);
   } catch (e) { toast(e.message); }
   busy(btn, false);
 });
 $("tNext").addEventListener("click", () => {
-  tIdx++;
-  if (tIdx < tItems.length) { nextTestItem(); return; }
-  // finished
-  const avg = Math.round(tScores.reduce((a, b) => a + b, 0) / tScores.length);
+  if (T.cur && T.cur.retry) { T.cur.retry = false; renderTestItem(); return; }
+  T.idx++;
+  if (T.mode === "checkpoint") {
+    if (T.idx < T.items.length) { renderTestItem(); return; }
+    finishCheckpoint();
+  } else {
+    if (plHasMore()) { buildPlacementItem(); return; }
+    finishPlacement();
+  }
+});
+function finishCheckpoint() {
+  const avg = Math.round(T.scores.reduce((a, b) => a + b, 0) / T.scores.length);
   const pass = avg >= 70;
-  const sum = $("tSummary");
-  sum.style.display = "";
-  $("tPrompt").textContent = "";
+  resetTestUI();
   $("tInput").style.display = "none";
   $("tCheck").style.display = "none";
-  $("tNext").style.display = "none";
-  $("tAudioRow").style.display = "none";
-  $("tOpts").style.display = "none";
-  $("tResult").classList.remove("show");
-  $("tProg").textContent = "Scores: " + tScores.join(", ") + " (average " + avg + ")";
+  $("tPrompt").textContent = "";
+  const sum = $("tSummary");
+  sum.style.display = "";
+  $("tProg").textContent = "Scores: " + T.scores.join(", ") + " (average " + avg + ")";
   if (pass) {
     S.gate.pending = false;
     save();
-    sum.innerHTML = "<b>Passed!</b> Level " + S.gate.level + " confirmed. Onward.";
+    sum.innerHTML = "<b>Passed!</b> Level " + S.gate.level + " confirmed, and any goals you hit are now marked in the syllabus. Onward.";
     addXP(20, false);
     renderProgress();
   } else {
     sum.innerHTML = "<b>Not this time (needed 70).</b> Look at what tripped you up, drill it in Grammar or Vocab, and retake the test from the banner whenever you like.";
   }
-});
+}
+function finishPlacement() {
+  resetTestUI();
+  $("tInput").style.display = "none";
+  $("tCheck").style.display = "none";
+  $("tPrompt").textContent = "";
+  for (const sk of pl.skList) applyPlacement(sk, pl.levels[sk]);
+  S.profile.placedAt = Date.now();
+  save();
+  let html = "<b>Placement complete.</b><br>";
+  let points = 0;
+  for (const sk of SKILLS) {
+    const lvl = pl.levels[sk];
+    html += SKILL_NAMES[sk] + ": <b>" + (lvl || "not tested (no Norwegian voice)") + "</b><br>";
+    points += lvl === "B1" ? 2 : lvl === "A2" ? 1 : 0;
+  }
+  const floor = 20 + points * 25;
+  const sum = $("tSummary");
+  sum.style.display = "";
+  sum.innerHTML = html;
+  $("tProg").textContent = "Scores: " + T.scores.join(", ");
+  if (floor > S.level) {
+    const b = document.createElement("button");
+    b.textContent = "Set my level to " + floor + " to match";
+    b.style.marginTop = "10px";
+    b.addEventListener("click", () => {
+      S.level = floor; S.xp = 0; save(); renderProgress();
+      toast("Level set to " + floor);
+      b.remove();
+    });
+    sum.appendChild(document.createElement("br"));
+    sum.appendChild(b);
+  }
+  renderStats();
+}
 $("tBack").addEventListener("click", () => showView("translate"));
 
 /* ============================================================
@@ -1559,7 +1882,60 @@ function renderStats() {
   $("stCards").textContent = S.deck.length;
   $("stEx").textContent = S.stats.exercises;
   $("stDays").textContent = Object.keys(S.stats.days).length;
+  // per-skill profile
+  const pr = $("profileRows");
+  pr.innerHTML = "";
+  for (const sk of SKILLS) {
+    const b1 = coverage("B1", sk);
+    const lvl = S.profile[sk];
+    const row = document.createElement("div");
+    row.className = "profrow";
+    row.innerHTML = "<span>" + SKILL_NAMES[sk] + "</span>" +
+      '<span class="p-cov">B1 goals ' + b1.done + "/" + b1.total + "</span>" +
+      '<span class="p-lvl">' + (lvl || "not placed") + "</span>";
+    pr.appendChild(row);
+  }
+  const tot = coverage("B1");
+  const totRow = document.createElement("div");
+  totRow.className = "profrow";
+  totRow.innerHTML = "<span><b>B1 goals demonstrated</b></span><span></span><span class=\"p-lvl\">" + tot.done + " of " + tot.total + "</span>";
+  pr.appendChild(totRow);
+  if (!S.profile.placedAt) {
+    const hint = document.createElement("p");
+    hint.className = "hint";
+    hint.textContent = "Take the placement test below to find your verified starting point per skill.";
+    pr.appendChild(hint);
+  }
+  renderSyllabusList();
 }
+function renderSyllabusList() {
+  const wrap = $("sylList");
+  wrap.innerHTML = "";
+  for (const lv of LV_ORDER) {
+    for (const sk of SKILLS) {
+      const goals = goalsFor(lv, sk);
+      const cov = coverage(lv, sk);
+      const det = document.createElement("details");
+      det.className = "syl";
+      const sum = document.createElement("summary");
+      sum.textContent = lv + " " + SKILL_NAMES[sk].toLowerCase() + " (" + cov.done + "/" + cov.total + ")";
+      det.appendChild(sum);
+      for (const g of goals) {
+        const st = goalState(g.id);
+        const row = document.createElement("div");
+        row.className = "goalrow" + (st === 2 ? " done" : st === 1 ? " part" : "");
+        row.innerHTML = '<span class="gmark">' + (st === 2 ? "&#10003;" : st === 1 ? "&#9679;" : "&#9675;") + "</span><span>" + esc(g.t) + "</span>";
+        det.appendChild(row);
+      }
+      wrap.appendChild(det);
+    }
+  }
+}
+$("plStart").addEventListener("click", () => {
+  if (S.profile.placedAt && !confirm("You have already taken the placement test. Retake it? (It can only raise your verified goals, never lower them.)")) return;
+  showView("test");
+  startPlacement();
+});
 function loadSettingsUI() {
   $("sKey").value = apiKey();
   $("sDiff").value = S.settings.difficulty;
@@ -1616,6 +1992,14 @@ $("sImportFile").addEventListener("change", e => {
         for (const [k, v] of Object.entries(d.grammarLog)) {
           S.grammarLog[k] = Math.max(S.grammarLog[k] || 0, v);
         }
+      }
+      if (d.goals) {
+        for (const [k, v] of Object.entries(d.goals)) {
+          if ((S.goals[k] || 0) < v) S.goals[k] = v;
+        }
+      }
+      if (d.profile && d.profile.placedAt && (!S.profile.placedAt || d.profile.placedAt > S.profile.placedAt)) {
+        S.profile = Object.assign({}, S.profile, d.profile);
       }
       if (d.settings) {
         S.settings.topics = d.settings.topics || S.settings.topics;

@@ -517,6 +517,8 @@ function load() {
       if (!Array.isArray(S.deck)) S.deck = [];
       if (!Array.isArray(S.recentEn)) S.recentEn = [];
       if (!Array.isArray(S.recentThemes)) S.recentThemes = [];
+      // clean out junk cards (e.g. bare numbers) from earlier versions
+      S.deck = S.deck.filter(c => c && c.no && c.en && /\p{L}/u.test(c.no) && /\p{L}/u.test(c.en));
       for (const c of S.deck) { if (c.lapses == null) c.lapses = 0; }
     }
   } catch (e) { console.error("load failed", e); }
@@ -845,7 +847,8 @@ function addCards(pairs) {
   for (const p of pairs || []) {
     if (!p || !p.no || !p.en) continue;
     const key = p.no.trim().toLowerCase();
-    if (!key || S.deck.some(c => c.no.trim().toLowerCase() === key)) continue;
+    if (!key || !/\p{L}/u.test(p.no) || !/\p{L}/u.test(p.en)) continue; // must contain real letters
+    if (S.deck.some(c => c.no.trim().toLowerCase() === key)) continue;
     S.deck.push(newCard(p.no, p.en));
     added++;
   }
@@ -1028,7 +1031,16 @@ let mCards = [], mSel = null, mWrong = {}, mDone = 0;
 function newMatchRound() {
   const due = dueCards();
   const pool = due.length >= 5 ? due : [...S.deck].sort(() => Math.random() - 0.5);
-  mCards = pool.slice(0, 5);
+  // never allow two cards with the same English side in one round
+  const seenEn = new Set();
+  const uniq = [];
+  for (const c of pool) {
+    const k = c.en.trim().toLowerCase();
+    if (seenEn.has(k)) continue;
+    seenEn.add(k);
+    uniq.push(c);
+  }
+  mCards = uniq.slice(0, 5);
   mSel = null; mWrong = {}; mDone = 0;
   const grid = $("mGrid");
   grid.innerHTML = "";
@@ -1403,18 +1415,31 @@ function pickVoices() {
 }
 if (window.speechSynthesis) speechSynthesis.onvoiceschanged = pickVoices;
 
+let warnedVoice = false;
+function ensureVoice() {
+  if (noVoice) return;
+  const voices = speechSynthesis.getVoices();
+  noVoice = voices.find(v => /^nb/i.test(v.lang)) || voices.find(v => /^(nb|no|nn)/i.test(v.lang)) || null;
+  if (!noVoice && !warnedVoice) {
+    warnedVoice = true;
+    toast("No Norwegian voice found on this device; trying the default voice. Install one in your system settings for reliable audio.", 5500);
+  }
+}
 function speak(text, rate) {
   if (!canSpeak()) { toast("This browser has no speech synthesis."); return; }
+  ensureVoice();
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "nb-NO";
   if (noVoice) u.voice = noVoice;
   u.rate = rate || 1;
   speechSynthesis.speak(u);
+  speechSynthesis.resume(); // Chrome sometimes starts paused and stays silent without this
 }
 function speakLong(text, rate) {
   // Queue sentence by sentence: more reliable than one long utterance, especially on iOS.
   if (!canSpeak()) { toast("This browser has no speech synthesis."); return; }
+  ensureVoice();
   speechSynthesis.cancel();
   const parts = text.match(/[^.!?]+[.!?]*/g) || [text];
   for (const part of parts) {
@@ -1426,6 +1451,7 @@ function speakLong(text, rate) {
     u.rate = rate || 1;
     speechSynthesis.speak(u);
   }
+  speechSynthesis.resume();
 }
 function listenSpec() {
   const words = Math.min(18, 6 + Math.floor(S.level / 12));

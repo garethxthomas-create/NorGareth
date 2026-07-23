@@ -669,10 +669,20 @@ async function callJSON(system, messages, maxTokens) {
   return extractJSON(text);
 }
 function promptContext() {
+  const pitch = S.level <= 75
+    ? " IMPORTANT: pitch everything at solid A2, no higher. Short simple sentences, high-frequency everyday vocabulary, one idea at a time. Language models always overestimate learners; when in doubt, make it easier."
+    : S.level <= 150
+    ? " Keep the language modest: clear sentences, everyday vocabulary, one grammar challenge at a time."
+    : "";
   return "Learner: Gareth, level " + S.level + " of " + TOTAL_LEVELS + " (" + cefrLabel(S.level) +
     ", lower-intermediate). Difficulty preference: " + S.settings.difficulty +
     ". Topics to draw from naturally: " + S.settings.topics +
-    ". Always Bokmål, never Nynorsk. English text uses US spelling. Never use em dashes anywhere.";
+    ". Always Bokmål, never Nynorsk. English text uses US spelling. Never use em dashes anywhere." +
+    " CRITICAL: the learner has NO formal grammar training. Never use a bare grammar term. If a term is unavoidable, define it instantly in everyday words with a tiny example, like: preteritum (the plain past tense, as in jeg lagde = I made). Prefer plain descriptions such as 'the past form' or 'the word for THE stuck on the end' over terminology." + pitch;
+}
+function knownWords(n) {
+  if (!S.deck.length) return "";
+  return [...S.deck].sort(() => Math.random() - 0.5).slice(0, n || 18).map(c => c.no).join(", ");
 }
 function vocabSpec() {
   return S.settings.cardStyle === "phrases"
@@ -833,13 +843,13 @@ async function markTranslation(english, norwegian, extraNote) {
     (extraNote ? " " + extraNote : "") +
     ' Mark the learner\'s Norwegian against the English. Respond with only JSON: ' +
     '{"score": 0-100, "corrected": "the learner\'s answer with minimal fixes applied", ' +
-    '"errors": [{"issue": "3-6 word label", "explanation": "clear English explanation of the rule and why", "tag": "one of: ' + TAG_LIST + '"}], ' +
+    '"errors": [{"issue": "3-6 word plain-English label", "explanation": "plain everyday English for someone with no grammar training; define any term you use, with a tiny Norwegian example", "tag": "one of: ' + TAG_LIST + '"}], ' +
     '"native": "what a native speaker would most naturally say", ' +
     '"comment": "one short honest sentence of feedback, not gushing", ' +
-    '"vocab": [{"no": "bokmål item", "en": "english"}]} ' +
+    '"vocab": [{"no": "bokmål item", "en": "plain English meaning, never a grammar label"}]} ' +
     "vocab holds up to 3 items the learner got wrong or was missing, worth drilling (" + vocabSpec() + "); [] if none. " +
     "If the answer is fully correct and natural, errors is [] and score is 95-100. " +
-    "Word-order, gender, and preposition slips all deserve an errors entry. Explanations teach; never just restate the fix.";
+    "Word-order, gender, and preposition slips all deserve an errors entry. Explanations teach; never just restate the fix, and never assume the learner knows what terms like preterite or definite form mean.";
   return callJSON(sys, [{ role: "user", content: "English: " + english + "\nLearner's Norwegian: " + norwegian }], 1200);
 }
 function logErrors(j) {
@@ -863,6 +873,39 @@ function renderMarking(el, j) {
   if (j.native) html += '<div class="nativebox"><b>A native would say:</b> ' + esc(j.native) + "</div>";
   el.innerHTML = html;
   el.classList.add("show");
+  if ((j.errors || []).length) {
+    const btn = document.createElement("button");
+    btn.className = "subtle";
+    btn.style.marginTop = "6px";
+    btn.textContent = "Explain more simply";
+    btn.addEventListener("click", () => simplifyExplanation(el, j, btn));
+    el.appendChild(btn);
+  }
+}
+async function simplifyExplanation(el, j, btn) {
+  busy(btn, true, "Rewriting...");
+  try {
+    const sys = "You explain Norwegian corrections to a smart adult with absolutely no grammar training. " +
+      "Rewrite the following error explanations in the simplest everyday English, one or two short sentences each, each with a tiny Norwegian example. " +
+      "Zero grammar terminology; describe what happens instead (say 'the past form of the word' not 'preterite'; say 'the little word that goes with it' not 'preposition'). Use US spelling. Never use em dashes." +
+      ' Respond with only JSON: {"text":"the rewritten explanation as plain text"}';
+    const payload = {
+      errors: (j.errors || []).map(e => ({ issue: e.issue, explanation: e.explanation })),
+      corrected: j.corrected || "",
+      native: j.native || ""
+    };
+    const r = await callJSON(sys, [{ role: "user", content: JSON.stringify(payload) }], 700);
+    if (r.text) {
+      const box = document.createElement("div");
+      box.className = "lesson";
+      box.style.marginTop = "8px";
+      box.textContent = r.text;
+      el.appendChild(box);
+      btn.remove();
+      return;
+    }
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
 }
 function absorbVocab(j) {
   const gained = addCards(j.vocab);
@@ -1097,7 +1140,8 @@ async function trNewSentence() {
       promptContext() +
       " Theme for this sentence: " + theme + "." +
       (pg ? " Make the sentence exercise this curriculum goal: " + pg + "." : "") +
-      " The sentence should be 8 to 16 words, natural and specific (real details, not generic filler), and include one level-appropriate grammar challenge (past tense, modal verbs, a subordinate clause, comparatives, etc.)." + avoid +
+      " The sentence should be " + (S.level <= 75 ? "6 to 10 words, a single clause" : S.level <= 150 ? "8 to 13 words" : "10 to 16 words") + ", natural and specific (real details, not generic filler), and include ONE level-appropriate grammar point, nothing more." +
+      (knownWords(18) ? " The Norwegian translation should mostly need vocabulary the learner has already studied: " + knownWords(18) + ". Introduce at most one or two words beyond that list." : "") + avoid +
       ' Respond with only JSON: {"english":"..."}';
     const j = await callJSON(sys, [{ role: "user", content: "One new sentence, please." }], 300);
     if (!j.english) throw new Error("No sentence returned. Try again.");
@@ -1471,6 +1515,7 @@ $("rdNew").addEventListener("click", async () => {
     const sys = "You write a short Norwegian Bokmål reading text with comprehension questions. " + promptContext() +
       " Format: " + style + ". Theme: " + theme + ". About " + readTargetWords() + " words, level-appropriate. " +
       (pg ? "The text should exercise this curriculum goal: " + pg + ". " : "") +
+      (knownWords(15) ? "Lean on vocabulary the learner has already studied where natural: " + knownWords(15) + ". " : "") +
       "Make it specific and lively, with concrete details such as names, numbers, times, and places. Absolutely avoid generic everyday filler like walking the dog or buying milk at the store. A little humor or tension is welcome. " +
       "Then 3 multiple-choice comprehension questions IN NORWEGIAN, each with exactly 3 options and one correct answer. Make wrong options plausible. " +
       ' Respond with only JSON: {"passage":"...","questions":[{"q":"...","options":["...","...","..."],"answer":0,"why":"one short English sentence explaining the answer"}]}';
@@ -1560,7 +1605,7 @@ async function lookupWord(token, span) {
     const context = rdCurrent.passage.slice(Math.max(0, idx - 120), idx + 140);
     const sys = "You are a Norwegian-English dictionary that understands context. " +
       "Given a Bokmål word and the sentence it appears in, explain it. Use US spelling. Never use em dashes. " +
-      ' Respond with only JSON: {"no":"the dictionary (base) form","en":"meaning in this exact context","note":"very short grammar note, e.g. neuter noun; preteritum of å gå; plural of bok"}';
+      ' Respond with only JSON: {"no":"the dictionary (base) form","en":"plain English meaning in this exact context","note":"one short plain-English usage note WITH a tiny example, e.g. an et-word: et hus; the past form of å gå: jeg gikk i går; usually paired with på: på jobb. Never a bare label like (with preposition)."}';
     const j = await callJSON(sys, [{ role: "user", content: "Word: " + word + "\nContext: ..." + context + "..." }], 300);
     box.innerHTML = "<b>" + esc(j.no || word) + "</b> = " + esc(j.en || "?") +
       (j.note ? '<br><span style="font-size:.82rem">' + esc(j.note) + "</span>" : "");
@@ -1671,6 +1716,7 @@ async function liNewSentence() {
     const sys = "You write Norwegian Bokmål for a listening dictation exercise. " + promptContext() +
       " Theme: " + theme + ". " + listenSpec() + " Natural spoken Norwegian, level-appropriate, specific rather than generic." +
       (pg ? " The item should exercise this curriculum goal: " + pg + "." : "") +
+      (knownWords(15) ? " Use mostly vocabulary the learner has already studied: " + knownWords(15) + "." : "") +
       ' Respond with only JSON: {"norwegian":"...","english":"..."}';
     const j = await callJSON(sys, [{ role: "user", content: "One new dictation item." }], 400);
     if (!j.norwegian) throw new Error("No sentence returned. Try again.");
@@ -1694,7 +1740,7 @@ async function liCheckAnswer() {
     const sys = "You mark a Norwegian listening dictation. " + promptContext() +
       " Compare what the learner typed to the actual text. Small spelling slips matter less than missed or wrong words. " +
       ' Respond with only JSON: {"score":0-100,' +
-      '"errors":[{"issue":"3-6 word label","explanation":"what was missed or misheard and why it matters, in English","tag":"one of: ' + TAG_LIST + '"}],' +
+      '"errors":[{"issue":"3-6 word plain-English label","explanation":"what was missed or misheard, in plain everyday English with no unexplained grammar terms","tag":"one of: ' + TAG_LIST + '"}],' +
       '"comment":"one short honest sentence",' +
       '"vocab":[{"no":"...","en":"..."}]} ' +
       "vocab holds up to 3 missed items worth drilling (" + vocabSpec() + "); [] if none.";

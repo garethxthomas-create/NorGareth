@@ -440,8 +440,11 @@ details.syl summary{cursor:pointer; font-weight:600; font-size:.9rem; padding:10
     <label for="sTopics">Your personal topics</label>
     <textarea id="sTopics"></textarea>
     <p class="hint">These are mixed automatically with core learner themes like numbers, dates and times, directions, feelings, and making plans, so your practice covers the essentials too.</p>
-    <label for="sVoice">Norwegian voice</label>
+    <label for="sVoice">Norwegian voice (device)</label>
     <select id="sVoice"></select>
+    <label for="sGTts">Google Cloud TTS key (optional premium voice)</label>
+    <input type="password" id="sGTts" placeholder="AIza..." autocomplete="off">
+    <p class="hint">With a key, all audio uses Google's natural Norwegian WaveNet voice on every device, with the device voice as fallback. Google's free tier (1M characters/month) makes this effectively free.</p>
     <div class="btnrow"><button id="sSave">Save settings</button></div>
   </div>
   <div class="card">
@@ -1663,7 +1666,40 @@ function ensureVoice() {
     toast("No Norwegian voice found on this device; trying the default voice. Install one in your system settings for reliable audio.", 5500);
   }
 }
+/* ----- premium voice: Google Cloud TTS with device-voice fallback ----- */
+const GTTS_KEY = "norgareth_gtts";
+function gttsKey() { return localStorage.getItem(GTTS_KEY) || ""; }
+let gAudio = null, gttsWarned = false;
+async function googleSpeak(text, rate) {
+  try {
+    if (gAudio) { gAudio.pause(); gAudio = null; }
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    const url = "https://texttospeech.googleapis.com/v1/text:synthesize?key=" + encodeURIComponent(gttsKey());
+    const mk = voice => ({ input: { text: text }, voice: voice, audioConfig: { audioEncoding: "MP3", speakingRate: rate || 1 } });
+    let res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify(mk({ languageCode: "nb-NO", name: "nb-NO-Wavenet-A" })) });
+    if (res.status === 400) {
+      res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify(mk({ languageCode: "nb-NO" })) });
+    }
+    if (!res.ok) throw new Error("Google TTS error " + res.status);
+    const j = await res.json();
+    gAudio = new Audio("data:audio/mp3;base64," + j.audioContent);
+    await gAudio.play();
+  } catch (e) {
+    if (!gttsWarned) { gttsWarned = true; toast("Premium voice unavailable (" + e.message + "); using the device voice.", 4500); }
+    browserSpeak(text, rate);
+  }
+}
 function speak(text, rate) {
+  if (gttsKey()) { googleSpeak(text, rate); return; }
+  browserSpeak(text, rate);
+}
+function speakLong(text, rate) {
+  if (gttsKey()) { googleSpeak(text, rate); return; } // Google handles whole passages in one request
+  browserSpeakLong(text, rate);
+}
+function browserSpeak(text, rate) {
   if (!canSpeak()) { toast("This browser has no speech synthesis."); return; }
   ensureVoice();
   speechSynthesis.cancel();
@@ -1678,7 +1714,7 @@ function speak(text, rate) {
     speechSynthesis.resume(); // Chrome sometimes starts paused and stays silent without this
   }, 60);
 }
-function speakLong(text, rate) {
+function browserSpeakLong(text, rate) {
   // Queue sentence by sentence: more reliable than one long utterance, especially on iOS.
   if (!canSpeak()) { toast("This browser has no speech synthesis."); return; }
   ensureVoice();
@@ -2353,6 +2389,7 @@ function loadSettingsUI() {
   $("sTopics").value = S.settings.topics;
   $("sGhToken").value = ghToken();
   if (ghToken()) $("syncStatus").textContent = "Connected. Syncs automatically.";
+  $("sGTts").value = gttsKey();
   pickVoices();
 }
 $("sSave").addEventListener("click", () => {
@@ -2362,6 +2399,9 @@ $("sSave").addEventListener("click", () => {
   S.settings.cardStyle = $("sCardStyle").value;
   S.settings.topics = $("sTopics").value.trim() || DEFAULT_TOPICS;
   S.settings.voiceURI = $("sVoice").value;
+  const gk = $("sGTts").value.trim();
+  if (gk) localStorage.setItem(GTTS_KEY, gk); else localStorage.removeItem(GTTS_KEY);
+  gttsWarned = false;
   const voices = canSpeak() ? speechSynthesis.getVoices() : [];
   noVoice = voices.find(v => v.voiceURI === S.settings.voiceURI) || noVoice;
   save();
@@ -2402,6 +2442,7 @@ $("sReset").addEventListener("click", () => {
   localStorage.removeItem(KEY_KEY);
   localStorage.removeItem(GH_TOKEN_KEY);
   localStorage.removeItem(GIST_ID_KEY);
+  localStorage.removeItem(GTTS_KEY);
   location.reload();
 });
 
